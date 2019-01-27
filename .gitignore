@@ -1,0 +1,11 @@
+global_node_modules/
+node_modules/
+config.json
+yarn-error.log
+
+*~
+.idea
+
+dist/
+
+config/secrets/*.pem

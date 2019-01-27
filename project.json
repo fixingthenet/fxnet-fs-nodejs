@@ -1,0 +1,10 @@
+{
+  "project": "fxnet-fs-nodejs",
+    
+  "git": "github.com/fixingthenet/fxnet-fs-nodejs",
+  "path": "fxnet-fs-nodejs",
+  "docker": {
+    "repo": "fxnet",
+    "name": "fxnet-fs-nodejs"
+  }
+}
