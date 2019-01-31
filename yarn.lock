@@ -1598,6 +1598,11 @@ graphql-upload@^8.0.2:
     http-errors "^1.7.1"
     object-path "^0.11.4"
 
+graphql.js@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/graphql.js/-/graphql.js-0.6.1.tgz#7adaaf37b1ca221ce54751324156400c600d3d03"
+  integrity sha512-4QD4kciRSrBFW0SfLwD5TqSLeB2BugR9YwjULqGnewnu7q1H9qlD5WfwvggfKsrDvcav8QNcab7uHYlRljw9Ug==
+
 graphql@^0.13.1:
   version "0.13.2"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-0.13.2.tgz#4c740ae3c222823e7004096f832e7b93b2108270"
