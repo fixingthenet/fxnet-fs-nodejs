@@ -1,5 +1,4 @@
-//import Axios from 'axios';
-import graphql from  'graphql.js'
+const graphql = require('graphql.js');
 const API_API_URL = `${process.env.AUTH_API_URL}graphql`;
 
 const authApi = function(token) {
@@ -46,4 +45,4 @@ const q={
 }
 //, {}, }
 
-export default q;
+module.exports= q;

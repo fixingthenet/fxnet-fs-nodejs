@@ -1,18 +1,17 @@
 //middleware
 const express = require('express');
 const logger = require('morgan');
-const bodyParser = require('body-parser')
-const cors = require('cors')
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
 //const { applyMiddleware } = require('graphql-middleware');
 //import server from './server';
-import models from './models';
+const models = require('./models');
 var jsdav = require('jsDAV/lib/jsdav');
-import Url from 'url';
-var jsDAV_Locks_Backend_FS = require("jsDAV/lib/DAV/plugins/locks/fs");
-import authPlugin from 'jsDAV/lib/DAV/plugins/auth'
-
-import authBackend from './auth'
+const Url = require('url');
+const jsDAV_Locks_Backend_FS = require("jsDAV/lib/DAV/plugins/locks/fs");
+const authPlugin = require('jsDAV/lib/DAV/plugins/auth');
+const authBackend = require('./auth');
 
 async function start(listen) {
     // Make sure the database tables are up to date
@@ -76,24 +75,25 @@ async function start(listen) {
 
 
         })
-    }
-    var listeners = httpServer.listeners("request");
-    httpServer.removeAllListeners("request");
-    httpServer.addListener("request", function(req, resp) {
-                var path = Url.parse(req.url).pathname;
-                if (path.charAt(path.length - 1) != "/")
-                    path = path + "/";
-        if (path.match(/^\/api\/|^\/grapql\//)) { // exlude our paths here
-            for (var i = 0, len = listeners.length; i < len; ++i)
-                listeners[i].call(httpServer, req, resp);
-        } else {
-            jsdavServer.exec(req, resp);
-        }
 
-    });
+        var listeners = httpServer.listeners("request");
+        httpServer.removeAllListeners("request");
+        httpServer.addListener("request", function(req, resp) {
+            var path = Url.parse(req.url).pathname;
+            if (path.charAt(path.length - 1) != "/")
+                path = path + "/";
+            if (path.match(/^\/api\/|^\/grapql\//)) { // exlude our paths here
+                for (var i = 0, len = listeners.length; i < len; ++i)
+                    listeners[i].call(httpServer, req, resp);
+            } else {
+                jsdavServer.exec(req, resp);
+            }
+
+        });
+    }
 }
 
-export default {
+module.exports= {
     start,
     models,
 }

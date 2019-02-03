@@ -1,4 +1,4 @@
-FROM node:10.12.0-stretch
+FROM node:11.9.0-stretch
 RUN apt update -y && \
     apt install -y \
     procps  \

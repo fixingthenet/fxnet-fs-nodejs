@@ -1,5 +1,5 @@
-import authAPI from './lib/auth_api'
-import jsDAVBasicAuth from "jsDAV/lib/DAV/plugins/auth/abstractBasic";
+const authAPI = require('./lib/auth_api')
+const jsDAVBasicAuth = require('jsDAV/lib/DAV/plugins/auth/abstractBasic');
 
 // username and password via basic auth
 // either real username and password
@@ -24,4 +24,5 @@ var authBackend = jsDAVBasicAuth.extend({
 
     },
 })
-export default authBackend;
+module.exports = authBackend;
+
