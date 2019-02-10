@@ -12,6 +12,7 @@ const Url = require('url');
 const jsDAV_Locks_Backend_FS = require("jsDAV/lib/DAV/plugins/locks/fs");
 const authPlugin = require('jsDAV/lib/DAV/plugins/auth');
 const authBackend = require('./auth');
+const inodesTree = require('./tree');
 
 async function start(listen) {
     // Make sure the database tables are up to date
@@ -56,7 +57,8 @@ async function start(listen) {
         // })
         //console.log(jsdavServer)
         var jsdavServer=jsdav.mount({
-            node: __dirname + "/../public",
+            //node: __dirname + "/../public",
+            tree: inodesTree.new('/code/public'),
             server: httpServer,
             locksBackend: jsDAV_Locks_Backend_FS.new(__dirname + "/../locks"),
             authBackend: authBackend.new(),
@@ -82,7 +84,7 @@ async function start(listen) {
             var path = Url.parse(req.url).pathname;
             if (path.charAt(path.length - 1) != "/")
                 path = path + "/";
-            if (path.match(/^\/api\/|^\/grapql\//)) { // exlude our paths here
+            if (path.match(/^\/api\/|^\/graphql\//)) { // exlude our paths here
                 for (var i = 0, len = listeners.length; i < len; ++i)
                     listeners[i].call(httpServer, req, resp);
             } else {
