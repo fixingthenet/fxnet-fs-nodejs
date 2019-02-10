@@ -1,4 +1,5 @@
 const models = require('../models');
+var Exc = require("jsDAV/lib/shared/exceptions");
 
 class StoragePath {
     // inodes is optional but can drastically reduce
@@ -27,8 +28,9 @@ class StoragePath {
 
     async isExisting() {
         var inodes=await this.inodes()
-        console.log(inodes.length, this.path, this.path_parts,
-                    this.path_parts.length)
+        console.log("isExisting", inodes.length,
+                    this.path, this.path_parts,
+                    this.path_parts.length+1)
         return inodes.length == this.path_parts.length+1
     }
 
@@ -42,11 +44,7 @@ class StoragePath {
             var e=await this.entry()
             if (e.is_folder) {
                 return (await e.children()).map(inodeChild => {
-                    return new StoragePath(
-                        this.path+'/'+inodeChild.name,
-                        this.user,
-                        [].concat(this._inodes).concat([inodeChild])
-                    )
+                    return this._wrapInode(inodeChild)
                 })
             } else {
                 return [] // or error?
@@ -56,28 +54,70 @@ class StoragePath {
         }
     }
 
+    async child(name) {
+        if (await this.isExisting()) {
+            var e=await this.entry()
+            if (e.is_folder) {
+                return this._wrapInode(await e.child(name))
+            }
+        }
+    }
+
+    async createChild(name,isFolder) {
+        try {
+            var e=await this.entry()
+            var child=await models.Inode.create(
+                {name: name,
+                 parent_id: e.id,
+                 is_folder: isFolder,
+                 created_at: new Date(),
+                 modified_at: new Date(),
+                 updated_at: new Date(),
+                })
+            return this._wrapInode(child)
+        } catch(e) {
+            return null
+        }
+    }
+
+    _wrapInode(inode) {
+        new StoragePath(
+            this.path+'/'+inode.name,
+            this.user,
+            [].concat(this._inodes).concat([inode])
+        )
+    }
+    //-------------------------------------------
+    // inode,icollection, ifile
+    // needs lots of redesign
+
    getName() {
         console.log("getName",this.path)
        return this.name
     }
 
+
     getLastModified(cb) {
-        return this.entry().then(entry => {cb(entry.modified_at)})
+        console.log("getLastModified",this.path)
+        this.entry().then(entry => {
+            console.log(entry.modified_at)
+            cb(null,entry.modified_at)
+        })
     }
     getSize(cb) {
-        return this.entry().then(entry => {cb(2000)})
+        this.entry().then(entry => {cb(null,2000)})
     }
     getQuotaInfo(cb) {
        // used, available,
-        return this.entry().then(entry => {cb([4000,8000])})
+        this.entry().then(entry => {cb(null,[4000,8000])})
     }
     getETag(cb) {
         // used, available,
-        return this.entry().then(entry => {cb("xfjztcrcuzr")})
+        this.entry().then(entry => {cb(null,"xfjztcrcuzr")})
     }
     getContentType(cb) {
         // used, available,
-        return this.entry().then(entry => {cb("video/avi")})
+        this.entry().then(entry => {cb(null,"video/avi")})
     }
 
     getChildren(cb) {
@@ -90,10 +130,15 @@ class StoragePath {
 
     getHref(cb) {
         console.log("getHref")
+        cb(path)
     }
 
-    getChild(cb) {
-        console.log("getChild CALLED!")
+    getChild(name,cb) {
+        this.child(name).then(child => {
+                cb(null,child)
+        }).catch(e => {
+                cb(Exc.FileNotFound(`File not found`))
+        })
     }
 
     getProperties(cb) {
@@ -113,7 +158,12 @@ class StoragePath {
     getProperties(properties, cbgetprops) {
             cbgetprops(null, []);
     }
-
+    createExtendedCollection(newName, resourceType, properties, cb) {
+        console.log("createextendedcollection",newName,resourceType, properties)
+        this.createChild(newName,true).then(child => {
+            cb(null, child)
+        })
+    }
 }
 
 module.exports=StoragePath

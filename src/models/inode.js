@@ -28,7 +28,16 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'inodes'
     }
                                   );
+    Inode.prototype.child= async function(name) {
+        if (this.is_folder) {
+            return await Inode.findOne({where: {parent_id: this.id,
+                                                name: name
+                                               }})
+        } else {
+            throw "Only folder have children."
+        }
 
+    }
     Inode.prototype.children = async function()  {
         if (this.is_folder) {
             return await Inode.findAll({where: {parent_id: this.id}})
