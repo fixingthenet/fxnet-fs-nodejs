@@ -19,7 +19,7 @@ var inodesTree = jsDAV_Tree.extend({
                 return cbfstree(new Exc.FileNotFound(`File at location ${path} not found`));
             }
 
-            console.log("getNodeforpath result",sp)
+//            console.log("getNodeforpath result",sp)
             return cbfstree(null,sp)
 
         })

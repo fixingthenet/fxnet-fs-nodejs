@@ -1,5 +1,28 @@
 const models = require('../models');
-var Exc = require("jsDAV/lib/shared/exceptions");
+const Exc = require("jsDAV/lib/shared/exceptions");
+const Fs = require('fs');
+const stream = require('stream');
+const crypto = require('crypto')
+
+class BinaryStoreWriteStream extends stream.Writable {
+    constructor(storagePath) {
+        super({emitClose: true});
+        this.storagePath=storagePath
+        this.bytes_written=0
+        this.shasum = crypto.createHash('sha512');
+    }
+
+    _write(chunk, enc, next) {
+        console.log("RECEIVED:",chunk.length)//,chunk.toString('ascii'));
+        this.shasum.update(chunk.toString('ascii'));
+        this.bytes_written =  this.bytes_written + chunk.length
+        next();
+    }
+
+    etag() {
+        return this.shasum.digest('hex');
+    }
+}
 
 class StoragePath {
     // inodes is optional but can drastically reduce
@@ -81,7 +104,7 @@ class StoragePath {
     }
 
     _wrapInode(inode) {
-        new StoragePath(
+        return new StoragePath(
             this.path+'/'+inode.name,
             this.user,
             [].concat(this._inodes).concat([inode])
@@ -109,21 +132,19 @@ class StoragePath {
     }
     getQuotaInfo(cb) {
        // used, available,
-        this.entry().then(entry => {cb(null,[4000,8000])})
+        this.entry().then(entry => {cb(null,[400,8000000000])})
     }
     getETag(cb) {
-        // used, available,
         this.entry().then(entry => {cb(null,"xfjztcrcuzr")})
     }
     getContentType(cb) {
-        // used, available,
         this.entry().then(entry => {cb(null,"video/avi")})
     }
 
     getChildren(cb) {
         console.log("getChildren",this.path)
         this.children().then(children => {
-            console.log(children)
+            console.log("Children:",children)
             cb(null,children)
         })
     }
@@ -140,6 +161,7 @@ class StoragePath {
                 cb(Exc.FileNotFound(`File not found`))
         })
     }
+
 
     getProperties(cb) {
         console.log("getProperties CALLED!")
@@ -158,12 +180,62 @@ class StoragePath {
     getProperties(properties, cbgetprops) {
             cbgetprops(null, []);
     }
+
     createExtendedCollection(newName, resourceType, properties, cb) {
         console.log("createextendedcollection",newName,resourceType, properties)
         this.createChild(newName,true).then(child => {
             cb(null, child)
         })
     }
+
+    async createFileStream(handler, name,enc,cb) {
+        var size = handler.httpRequest.headers["x-file-size"];
+        console.log("createFileStream", this.path, name, enc, size);
+
+        var child = await this.createChild(name, false)
+
+        if (size) {
+            if (!handler.httpRequest.headers["x-file-name"])
+                handler.httpRequest.headers["x-file-name"] = name;
+            //            this.writeFileChunk(handler, enc, cbfscreatefile);
+            cb(Exc.FileNotFound('ups'))
+
+        } else {
+            var stream = new  BinaryStoreWriteStream(child)
+            stream.on("finish",() => {
+                console.log("upload done (finish)",stream.bytes_written);
+                stream.destroy();
+
+            })
+            stream.on("close",() => {
+                console.log("upload done (close)",stream.bytes_written)})
+            handler.getRequestBody(enc, stream, true, cb);
+        }
+    }
+
+     async createFileStreamRaw(name, stream, enc, cbfscreatefile) {
+         console.log("createFileStreamRaw", name)
+         var child = await this.createChild(name, false)
+         var stream = new  BinaryStoreWriteStream(child)
+         stream.on("finish",() => {
+             console.log("upload done",stream.bytes_written)})
+
+         stream.pipe(stream);
+     }
+
+    async createFile(name, data, enc, cb) {
+        console.log("createFile", data.length)
+         //var child = await this.createChild(name, false)
+         //var stream = new  BinaryStoreWriteStream(child)
+         //stream.on("finish",() => {
+         //    console.log("upload done",stream.bytes_written)})
+        //if (data.length === 0) {
+        //     data = new Buffer(0);
+        //     enc  = "binary";
+        // }
+        // stream.write(data)
+     }
+
 }
 
 module.exports=StoragePath

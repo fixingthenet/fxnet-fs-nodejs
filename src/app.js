@@ -40,22 +40,7 @@ async function start(listen) {
         var httpServer=app.listen(options,() => {
             console.log(`Server is running on localhost`);
         })
-        // var jsdavServer=new Server({
-        //     node: __dirname + "/../public",
-        //     locksBackend: jsDAV_Locks_Backend_FS.new(__dirname + "/../locks"),
-        //     authBackend: authBackend.new(),
-        //     realm: "test",
-        //     mount: '/',
-        //     plugins: [
-        //         authPlugin
-        //     ],
-        //     standalone: false,
-        // })
 
-        // httpServer.addListener("request", (req,resp)=>{
-        //     jsdavServer.exec(req,resp)
-        // })
-        //console.log(jsdavServer)
         var jsdavServer=jsdav.mount({
             //node: __dirname + "/../public",
             tree: inodesTree.new('/code/public'),
@@ -82,6 +67,7 @@ async function start(listen) {
         httpServer.removeAllListeners("request");
         httpServer.addListener("request", function(req, resp) {
             var path = Url.parse(req.url).pathname;
+            console.log("Path", path);
             if (path.charAt(path.length - 1) != "/")
                 path = path + "/";
             if (path.match(/^\/api\/|^\/graphql\//)) { // exlude our paths here

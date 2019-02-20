@@ -1534,7 +1534,7 @@ globals@^9.18.0:
   resolved "https://registry.yarnpkg.com/globals/-/globals-9.18.0.tgz#aa3896b3e69b487f17e31ed2143d69a8e30c2d8a"
   integrity sha512-S0nG3CLEQiY/ILxqtztTWH/3iRRdyBLw6KMDxnKMchrtbj2OFmehVh0WUCfW3DUrIgx/qFrJPICrq4Z4sTR9UQ==
 
-gnu-tools@0.0.9, gnu-tools@^0.0.9:
+gnu-tools@0.0.9:
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/gnu-tools/-/gnu-tools-0.0.9.tgz#dff6238a26aebc394ffc061359edfeab0bdc9911"
   integrity sha1-3/YjiiauvDlP/AYTWe3+qwvcmRE=

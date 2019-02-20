@@ -31,7 +31,8 @@ module.exports = (sequelize, DataTypes) => {
     Inode.prototype.child= async function(name) {
         if (this.is_folder) {
             return await Inode.findOne({where: {parent_id: this.id,
-                                                name: name
+                                                name: name,
+                                                deleted_at: null
                                                }})
         } else {
             throw "Only folder have children."
@@ -40,7 +41,9 @@ module.exports = (sequelize, DataTypes) => {
     }
     Inode.prototype.children = async function()  {
         if (this.is_folder) {
-            return await Inode.findAll({where: {parent_id: this.id}})
+            return await Inode.findAll({where: {parent_id: this.id,
+                                                deleted_at: null
+                                               }})
         } else {
             throw "Only folder have children."
         }
@@ -63,7 +66,7 @@ module.exports = (sequelize, DataTypes) => {
                 SELECT inodes.*, depth + 1, regexp_replace(rest_path, '[^/]+/?(.*)', '\\1')
                 FROM inodes_full
                 JOIN inodes ON inodes_full.id = inodes.parent_id
-                WHERE inodes.name = regexp_replace(rest_path, '([^/]+).*', '\\1')
+                WHERE inodes.name = regexp_replace(rest_path, '([^/]+).*', '\\1') AND inodes.deleted_at IS NULL
              ) select * from inodes_full order by depth`,
                                                  { replacements:
                                                    {startPath: pathWithoutSlash},
