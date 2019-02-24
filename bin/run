@@ -3,4 +3,5 @@ export PATH=$PATH:/code/node_modules/.bin
 if [ ! -d /code/node_modules ]; then
   yarn install
 fi
-exec nodemon src/main.js --exec babel-node --presets es2015,stage-2
+exec nodemon src/main.js 
+#--exec babel-node --presets es2015,stage-2
