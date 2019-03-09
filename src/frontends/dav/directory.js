@@ -1,7 +1,6 @@
 const BinaryStoreWriteStream = require("../../binary_backends/binary_writer");
 
 
-
 const iCollection = require("jsDAV/lib/DAV/interfaces/iCollection");
 const iQuota = require("jsDAV/lib/DAV/interfaces/iQuota");
 
@@ -43,6 +42,7 @@ var FSDirectory = FSNode.extend(iCollection, iQuota, {
 //        console.log("getHref")
 //        cb(path)
 //   },
+
 
 
     async createFileStream(handler, name,enc,cb) {

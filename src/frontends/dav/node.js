@@ -8,9 +8,21 @@ var FSNode = iNode.extend({
 
 
     //TBD:
-    //delete
     //setName
     //exists
+
+    exists(cb) {
+        console.log("exists",this.storagePath.path)
+    },
+
+
+    async "delete"(cb) {
+        console.log("delete",this.storagePath.path)
+        await this.storagePath.remove();
+        cb(null,null)
+
+    },
+
     getName() {
         console.log("getName",this.storagePath.path)
         return this.storagePath.name

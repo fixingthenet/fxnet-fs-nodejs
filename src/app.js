@@ -41,6 +41,8 @@ async function start(listen) {
             console.log(`Server is running on localhost`);
         })
 
+        jsdav.debugMode=true;
+
         var jsdavServer=jsdav.mount({
             //node: __dirname + "/../public",
             tree: inodesTree.new('/code/public'),

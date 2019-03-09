@@ -8,13 +8,13 @@ module.exports = {
                      fields: ['parent_id','name'],
                      type: 'UNIQUE',
                      where: {
-                         deleted_at: {[Sequelize.Op.ne]: null}
+                         deleted_at:  null
                      }
                  }
              )
     },
     down: (queryInterface, Sequelize) => {
-        return queryInterface.dropIndex('inodes',
+        return queryInterface.removeIndex('inodes',
                                         'inodes_parent_id_name')
     }
 };

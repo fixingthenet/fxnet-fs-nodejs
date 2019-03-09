@@ -87,6 +87,15 @@ class StoragePath {
         }
     }
 
+    async remove() {
+        var e = await this.entry();
+        if (e.is_folder) {
+            throw "directory delete not implemented"
+        } else {
+            await e.destroy();
+        }
+    }
+
     _wrapInode(inode) {
         return new StoragePath(
             this.path+'/'+inode.name,

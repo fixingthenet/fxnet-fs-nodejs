@@ -23,9 +23,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATE
         },
     }, {
-        paranoid: false,
+        paranoid: true,
         underscored: true,
-        tableName: 'inodes'
+        tableName: 'inodes',
+//        deletedAt: 'deleted_at'
     }
                                   );
     Inode.prototype.child= async function(name) {
