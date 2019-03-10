@@ -11,6 +11,7 @@ var FSNode = iNode.extend({
     //setName
     //exists
 
+
     exists(cb) {
         console.log("exists",this.storagePath.path)
     },

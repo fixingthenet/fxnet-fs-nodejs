@@ -49,6 +49,27 @@ module.exports = (sequelize, DataTypes) => {
             throw "Only folder have children."
         }
     }
+    Inode.deleteDescendants = async function(id) {
+        await sequelize.query(`
+            WITH RECURSIVE inodes_full AS (
+            SELECT inodes.id,inodes.parent_id
+            FROM inodes
+            WHERE id = :id
+            UNION ALL
+            SELECT inodes.id, inodes.parent_id
+            FROM inodes_full
+            JOIN inodes ON inodes_full.id = inodes.parent_id
+            WHERE inodes.deleted_at IS NULL
+        ) UPDATE inodes SET deleted_at=:now
+          FROM inodes_full WHERE inodes_full.id=inodes.id`,
+                                                 { replacements:
+                                                   {id: id,
+                                                    now: new Date(),                                          },
+                                                   type: sequelize.QueryTypes.UPDATE
+                              }
+                             )
+    }
+
     Inode.resolvePath = async function(path,userId) {
         if (path.slice(0,1) != '/') {
             throw "Abolute path required"

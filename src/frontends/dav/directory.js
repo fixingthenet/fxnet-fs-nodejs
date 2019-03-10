@@ -3,12 +3,17 @@ const BinaryStoreWriteStream = require("../../binary_backends/binary_writer");
 
 const iCollection = require("jsDAV/lib/DAV/interfaces/iCollection");
 const iQuota = require("jsDAV/lib/DAV/interfaces/iQuota");
+const iExtendedCollection = require("jsDAV/lib/DAV/interfaces/iExtendedCollection");
+var Exc = require("jsDAV/lib/shared/exceptions");
 
 const FSNode = require("./node");
 const FSFile = require("./file");
 const async = require("async");
 
-var FSDirectory = FSNode.extend(iCollection, iQuota, {
+var FSDirectory = FSNode.extend(iCollection,
+                                iQuota,
+                                iExtendedCollection,
+                                {
     //iCollection
 
     //createFile
@@ -43,6 +48,17 @@ var FSDirectory = FSNode.extend(iCollection, iQuota, {
 //        cb(path)
 //   },
 
+
+     async createExtendedCollection(newName, resourceType, properties, cb) {
+         console.log("createextendedcollection",newName,
+                     resourceType, properties)
+         var child = await this.storagePath.createChild(newName,true)
+         if (child) {
+             cb( null, child)
+         } else {
+             cb(Exc.Conflict(newName), null)
+         }
+     },
 
 
     async createFileStream(handler, name,enc,cb) {

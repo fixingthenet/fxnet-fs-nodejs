@@ -90,7 +90,10 @@ class StoragePath {
     async remove() {
         var e = await this.entry();
         if (e.is_folder) {
-            throw "directory delete not implemented"
+            //TBD: delete each of them so we can emit events
+            // get the first 1000 deepest inodes
+            // and destroy them
+            await models.Inode.deleteDescendants(e.id)
         } else {
             await e.destroy();
         }
