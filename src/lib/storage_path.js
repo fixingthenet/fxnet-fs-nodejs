@@ -1,6 +1,6 @@
 const models = require('../models');
 const Exc = require("jsDAV/lib/shared/exceptions");
-const BinaryStoreWriteStream = require("../binary_backends/binary_writer");
+//const BinaryStoreWriteStream = require("../binary_backends/binary_writer");
 
 
 class StoragePath {
@@ -39,6 +39,16 @@ class StoragePath {
     async entry() {
         var i=await this.inodes();
         return i[i.length-1]
+    }
+
+    async storageKey() {
+        var e = await this.entry();
+        return e.storage_key
+    }
+
+    async contentType() {
+        var e = await this.entry()
+        return `${e.content_type_major}/${e.content_type_minor}`
     }
 
     async isFolder() {
@@ -97,6 +107,12 @@ class StoragePath {
         } else {
             await e.destroy();
         }
+    }
+
+    async updateMetaContent(atts) {
+        var e = await this.entry();
+        await e.update(atts)
+        return this;
     }
 
     _wrapInode(inode) {

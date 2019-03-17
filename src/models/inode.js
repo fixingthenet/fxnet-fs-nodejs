@@ -10,6 +10,24 @@ module.exports = (sequelize, DataTypes) => {
         is_folder: {
             type: DataTypes.BOOLEAN
         },
+        storage_key: {
+            type: DataTypes.STRING
+        },
+        sha512: {
+            type: DataTypes.STRING
+        },
+        content_type_major: {
+            type: DataTypes.STRING
+        },
+        content_type_minor: {
+            type: DataTypes.STRING
+        },
+        content_type_charset: {
+            type: DataTypes.STRING
+        },
+        content_size: {
+            type: DataTypes.BIGINT
+        },
         created_at: {
             type: DataTypes.DATE
         },

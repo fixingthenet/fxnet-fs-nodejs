@@ -74,15 +74,16 @@ var FSDirectory = FSNode.extend(iCollection,
             //            this.writeFileChunk(handler, enc, cbfscreatefile);
             cb(Exc.FileNotFound('ups'))
         } else {
-            var stream = new  BinaryStoreWriteStream(child)
-            stream.on("finish",async () => {
-                console.log("upload done (finish)",stream.bytes_written);
-                var contentType=await stream.contentType();
-                console.log("ContentType", contentType)
+            var stream = new BinaryStoreWriteStream(child)
+            await stream.init();
+            stream.on("finish",() => {
                 stream.destroy();
             })
-            stream.on("close",() => {
-                console.log("upload done (close)",stream.bytes_written)})
+            stream.on("close",async () => {
+                stream.closing()
+                console.log("upload done (close)")
+            })
+
             handler.getRequestBody(enc, stream, true, cb);
         }
     },

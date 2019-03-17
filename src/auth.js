@@ -12,10 +12,10 @@ var authBackend = jsDAVBasicAuth.extend({
                        password: password})
             .then((result) => {
                 if (result.sessionLogin.errors) {
-                    console.log("AUTH RESULT FAIL:", result)
+//                    console.log("AUTH RESULT FAIL:", result)
                     cb(false)
                 } else {
-                    console.log("AUTH RESULT SUCCESS:", result)
+//                   console.log("AUTH RESULT SUCCESS:", result)
                     cb(true)
                 }
             }).catch( (e) => {
