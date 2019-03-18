@@ -1,6 +1,6 @@
-const Fs = require('fs');
 const iFile = require("jsDAV/lib/DAV/interfaces/iFile");
 const FSNode = require("./node");
+const BinaryStoreReadStream = require('../../binary_backends/binary_reader.js')
 var FSFile = FSNode.extend(iFile, {
     //put
     //get
@@ -23,12 +23,11 @@ var FSFile = FSNode.extend(iFile, {
     },
 
     async getStream(start, end, cb) {
-        var options;
-        if (typeof start == "number" && typeof end == "number")
-            options = { start: start, end: end };
-        var path = await this.storagePath.storageKey();
-        console.log("Gettintg stream from", path);
-        var stream = Fs.createReadStream('/code/public/'+path, options);
+        var stream = new BinaryStoreReadStream(this.storagePath,
+                                                 start,
+                                                 end)
+        await stream.init();
+
         stream.on("data", function(data) {
             cb(null, data);
         });
@@ -38,8 +37,6 @@ var FSFile = FSNode.extend(iFile, {
         });
 
         stream.on("end", function() {
-            // Invoking the callback without error and data means that the callee
-            // can continue handling the request.
             cb();
         });
 
