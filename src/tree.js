@@ -43,9 +43,15 @@ var inodesTree = jsDAV_Tree.extend({
     async move(sourceName, destName, cb) {
         console.log("move",sourceName,destName)
         var source = new StoragePath(sourceName,null,null);
-        var sourceExists= await source.isExisting()
+        var sourceExists= await source.isExisting();
         var dest = new StoragePath(destName,null,null);
-        var destExists= await dest.isExisting()
+        var destExists= await dest.isExisting();
+        // if the dest's parent doesn't exist then stop
+        // if dest exists remove the dest
+        // change the entry's name and it's parent
+        // only move things I own? then move is expensive
+        // what's with the overwrite header?
+        // how to return problematic things
 
         cb(null,null)
     },
@@ -56,7 +62,9 @@ var inodesTree = jsDAV_Tree.extend({
         var sourceExists= await source.isExisting()
         var dest = new StoragePath(destName,null,null);
         var destExists= await dest.isExisting()
-
+        // how does copy work?
+        // merge the destination?
+        // what's with the overwrite header?
         cb(null,null)
     }
 
