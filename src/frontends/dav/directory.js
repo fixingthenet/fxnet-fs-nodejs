@@ -14,6 +14,7 @@ var FSDirectory = FSNode.extend(iCollection,
                                 iQuota,
                                 iExtendedCollection,
                                 {
+
     //iCollection
 
     //createFile
@@ -74,7 +75,7 @@ var FSDirectory = FSNode.extend(iCollection,
             //            this.writeFileChunk(handler, enc, cbfscreatefile);
             cb(Exc.FileNotFound('ups'))
         } else {
-            var stream = new BinaryStoreWriteStream(child)
+            var stream = new BinaryStoreWriteStream(child,this.basePath)
             await stream.init();
             stream.on("finish",() => {
                 stream.destroy();

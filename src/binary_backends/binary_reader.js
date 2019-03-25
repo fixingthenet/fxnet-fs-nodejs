@@ -2,11 +2,11 @@ const EventEmitter = require('events');
 const Fs = require('fs');
 
 class BinaryStoreReadStream extends EventEmitter {
-    constructor(storagePath,start,end) { //options: start,end
+    constructor(storagePath,basePath,start,end) { //options: start,end
         //super({emitClose: true});
         super();
         this.storagePath=storagePath
-        this.basePath='/code/public/';
+        this.basePath=basePath;
         this.start=start;
         this.end=end
 

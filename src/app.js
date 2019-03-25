@@ -45,7 +45,7 @@ async function start(listen) {
 
         var jsdavServer=jsdav.mount({
             //node: __dirname + "/../public",
-            tree: inodesTree.new('/code/public'),
+            tree: inodesTree.new('/code/public/'),
             server: httpServer,
             locksBackend: jsDAV_Locks_Backend_FS.new(__dirname + "/../locks"),
             authBackend: authBackend.new(),

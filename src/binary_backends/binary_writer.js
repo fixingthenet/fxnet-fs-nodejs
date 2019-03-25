@@ -14,9 +14,9 @@ const MAX_BYTES=10000;
 const contentTypeRegexp =/(.*?)\/(.*?); charset=(.*)/
 
 class BinaryStoreWriteStream extends stream.Writable {
-    constructor(storagePath) {
+    constructor(storagePath, basePath) {
         super({emitClose: true});
-        this.basePath='/code/public/';
+        this.basePath=basePath;
         this.storagePath=storagePath
         this.firstBytes = new Buffer.alloc(MAX_BYTES*2)
         this.shasum = crypto.createHash('sha512');

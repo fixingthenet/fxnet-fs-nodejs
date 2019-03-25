@@ -20,22 +20,22 @@ var inodesTree = jsDAV_Tree.extend({
     },
 
     async getNodeForPath(path, cbfstree) {
-        console.log("getNodeforPATH", path);
+        //console.log("getNodeforPATH", path);
         var sp=new StoragePath(path,null,null);
-        console.log("StroragPath", sp.path,sp.path_parts);
+        //console.log("StroragPath", sp.path,sp.path_parts);
         var exists= await sp.isExisting()
         if (exists) {
             var isFolder = await sp.isFolder();
             var node;
             if (isFolder) {
-                node = FSDirectory.new(sp)
+                node = FSDirectory.new(sp, this.basePath)
             } else {
-                node = FSFile.new(sp)
+                node = FSFile.new(sp, this.basePath)
             }
-            console.log("Node", node.hasFeature(iFile), node.hasFeature(iCollection))
+            //console.log("Node", node.hasFeature(iFile), node.hasFeature(iCollection))
             return cbfstree(null,node)
         } else {
-                console.log("doesn't exist", sp.path)
+                //console.log("doesn't exist", sp.path)
                 return cbfstree(new Exc.FileNotFound(`File at location ${path} not found`));
         }
     },

@@ -24,6 +24,7 @@ var FSFile = FSNode.extend(iFile, {
 
     async getStream(start, end, cb) {
         var stream = new BinaryStoreReadStream(this.storagePath,
+                                               this.basePath,
                                                  start,
                                                  end)
         await stream.init();

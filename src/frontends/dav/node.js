@@ -2,8 +2,9 @@ const iNode = require("jsDAV/lib/DAV/interfaces/iNode");
 const StoragePath = require("../../lib/storage_path")
 
 var FSNode = iNode.extend({
-    initialize(storagePath) {
+    initialize(storagePath, basePath) {
         this.storagePath=storagePath
+        this.basePath=basePath
     },
 
 
