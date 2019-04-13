@@ -10,7 +10,7 @@ var mmm = require('mmmagic'),
 var magic = new Magic(mmm.MAGIC_MIME_TYPE |
                       mmm.MAGIC_MIME_ENCODING);
 
-const MAX_BYTES=10000;
+const MAX_BYTES=20000;
 const contentTypeRegexp =/(.*?)\/(.*?); charset=(.*)/
 
 class BinaryStoreWriteStream extends stream.Writable {
@@ -33,7 +33,7 @@ class BinaryStoreWriteStream extends stream.Writable {
 
     async _write(chunk, enc, next) {
         if (this.bytes_written < MAX_BYTES) {
-            this.firstBytes.write(chunk.toString('ascii'))
+            this.firstBytes.write(chunk.toString('ascii'), 'ascii')
             console.log("Wrote firstBytes",
                         this.firstBytes.length)
 

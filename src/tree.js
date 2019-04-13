@@ -40,6 +40,13 @@ var inodesTree = jsDAV_Tree.extend({
         }
     },
 
+    // touch(path, size,mime_major,mime_minor, ecoding, key, sha512, created_at, modified_at )
+    // mkdir(path, created_at, modified_at )
+    // read(path, start, end) -> stream
+    // write(stream,path) -> ??? signal done
+    // stat(path)
+
+
     async move(sourceName, destName, cb) {
         console.log("move",sourceName,destName)
         var source = new StoragePath(sourceName,null,null);
