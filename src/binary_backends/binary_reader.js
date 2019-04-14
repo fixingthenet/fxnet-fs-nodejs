@@ -2,11 +2,10 @@ const EventEmitter = require('events');
 const Fs = require('fs');
 
 class BinaryStoreReadStream extends EventEmitter {
-    constructor(storagePath,basePath,start,end) { //options: start,end
+    constructor(file,start,end) { //options: start,end
         //super({emitClose: true});
         super();
-        this.storagePath=storagePath
-        this.basePath=basePath;
+        this.file=file;
         this.start=start;
         this.end=end
 
@@ -16,8 +15,8 @@ class BinaryStoreReadStream extends EventEmitter {
     }
 
     async init(){
-        var path = await this.storagePath.storageKey();
-        var stream = Fs.createReadStream(this.basePath+path,
+        var path = await this.file.storagePath.storageKey();
+        var stream = Fs.createReadStream(this.file.basePath()+path,
                                          this.options);
         stream.on("data", (data) => {
             this.emit("data",data)

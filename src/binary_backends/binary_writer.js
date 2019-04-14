@@ -14,10 +14,9 @@ const MAX_BYTES=20000;
 const contentTypeRegexp =/(.*?)\/(.*?); charset=(.*)/
 
 class BinaryStoreWriteStream extends stream.Writable {
-    constructor(storagePath, basePath) {
+    constructor(file) {
         super({emitClose: true});
-        this.basePath=basePath;
-        this.storagePath=storagePath
+        this.file=file
         this.firstBytes = new Buffer.alloc(MAX_BYTES*2)
         this.shasum = crypto.createHash('sha512');
 
@@ -28,7 +27,7 @@ class BinaryStoreWriteStream extends stream.Writable {
 
     async init() {
         await this._storageKey()
-        this.fd=await fsp.open(this.basePath+this.storageKey,'w')
+        this.fd=await fsp.open(this.file.basePath()+this.storageKey,'w')
     }
 
     async _write(chunk, enc, next) {
@@ -54,7 +53,7 @@ class BinaryStoreWriteStream extends stream.Writable {
         this.contentTypeMajor=cmatch[1];
         this.contentTypeMinor=cmatch[2];
         this.charset=cmatch[3];
-        await this.storagePath.updateMetaContent({
+        await this.file.storagePath.updateMetaContent({
             storage_key: this.storageKey,
             sha512: this.etag,
             content_size: this.bytes_written,
@@ -93,7 +92,7 @@ class BinaryStoreWriteStream extends stream.Writable {
             }
 
 
-            var entry = await this.storagePath.entry();
+            var entry = await this.file.storagePath.entry();
             var path = crypto.
                 createHash('md5').
                 update(entry.id).
@@ -101,7 +100,7 @@ class BinaryStoreWriteStream extends stream.Writable {
                 match(/(.{3})(.{3})(.{3})(.*)/).
                 slice(1,5);
 
-            var dir = this.basePath+path.slice(0,3).join('/');
+            var dir = this.file.basePath()+path.slice(0,3).join('/');
 
             this.storageKey=path.join('/')+'-'+entry.id;
             console.log("creating dir", path, dir, this.storageKey)

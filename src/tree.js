@@ -21,16 +21,16 @@ var inodesTree = jsDAV_Tree.extend({
 
     async getNodeForPath(path, cbfstree) {
         //console.log("getNodeforPATH", path);
-        var sp=new StoragePath(path,null,null);
+        var sp=new StoragePath(path,null,null,this);
         //console.log("StroragPath", sp.path,sp.path_parts);
         var exists= await sp.isExisting()
         if (exists) {
             var isFolder = await sp.isFolder();
             var node;
             if (isFolder) {
-                node = FSDirectory.new(sp, this.basePath)
+                node = FSDirectory.new(sp)
             } else {
-                node = FSFile.new(sp, this.basePath)
+                node = FSFile.new(sp)
             }
             //console.log("Node", node.hasFeature(iFile), node.hasFeature(iCollection))
             return cbfstree(null,node)
@@ -39,6 +39,10 @@ var inodesTree = jsDAV_Tree.extend({
                 return cbfstree(new Exc.FileNotFound(`File at location ${path} not found`));
         }
     },
+
+    // another idea is to let the tree decide how
+    // to do things. but jsDav hast to be changed for this!
+
 
     // touch(path, size,mime_major,mime_minor, ecoding, key, sha512, created_at, modified_at )
     // mkdir(path, created_at, modified_at )
@@ -72,6 +76,7 @@ var inodesTree = jsDAV_Tree.extend({
         // how does copy work?
         // merge the destination?
         // what's with the overwrite header?
+
         cb(null,null)
     }
 

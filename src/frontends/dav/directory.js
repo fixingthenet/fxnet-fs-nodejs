@@ -1,6 +1,3 @@
-const BinaryStoreWriteStream = require("../../binary_backends/binary_writer");
-
-
 const iCollection = require("jsDAV/lib/DAV/interfaces/iCollection");
 const iQuota = require("jsDAV/lib/DAV/interfaces/iQuota");
 const iExtendedCollection = require("jsDAV/lib/DAV/interfaces/iExtendedCollection");
@@ -62,31 +59,13 @@ var FSDirectory = FSNode.extend(iCollection,
      },
 
 
-    async createFileStream(handler, name,enc,cb) {
-        var size = handler.httpRequest.headers["x-file-size"];
-        console.log("createFileStream", this.storagePath.path,
-                    name, enc, size);
-
-        var child = await this.storagePath.createChild(name, false)
-
-        if (size) {
-            if (!handler.httpRequest.headers["x-file-name"])
-                handler.httpRequest.headers["x-file-name"] = name;
-            //            this.writeFileChunk(handler, enc, cbfscreatefile);
-            cb(Exc.FileNotFound('ups'))
-        } else {
-            var stream = new BinaryStoreWriteStream(child,this.basePath)
-            await stream.init();
-            stream.on("finish",() => {
-                stream.destroy();
-            })
-            stream.on("close",async () => {
-                stream.closing()
-                console.log("upload done (close)")
-            })
-
-            handler.getRequestBody(enc, stream, true, cb);
-        }
+      async createFileStream(handler, name,enc,cb) {
+          console.debug("createFileStream",
+                        this.storagePath.path,
+                        name, enc);
+          var childStoragePath = await this.storagePath.createChild(name, false);
+          var child = await this._wrapStoragePath(childStoragePath);
+          return child.putStream(handler, enc, cb);
     },
 
     async _wrapStoragePath(sp) {

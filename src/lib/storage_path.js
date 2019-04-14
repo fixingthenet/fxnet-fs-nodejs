@@ -6,10 +6,11 @@ const Exc = require("jsDAV/lib/shared/exceptions");
 class StoragePath {
     // inodes is optional but can drastically reduce
     // db accesses
-    constructor(path, user, inodes) {
+    constructor(path, user, inodes,tree) {
         this.path=path;
         this.user = user;
         this._inodes=inodes;
+        this.tree=tree;
 
         if (path=='') {
             this.path=''
@@ -119,57 +120,10 @@ class StoragePath {
         return new StoragePath(
             this.path+'/'+inode.name,
             this.user,
-            [].concat(this._inodes).concat([inode])
+            [].concat(this._inodes).concat([inode]),
+            this.tree
         )
     }
-    //-------------------------------------------
-    // inode,icollection, ifile
-    // needs lots of redesign
-
-
-
-
-
-    // exists(cb) {
-    //     this.isExisting().then(exists => {
-    //         cb(null, exists)
-    //     })
-    // }
-
-    // getProperties(properties, cbgetprops) {
-    //     console.log("getProperties CALLED!")
-    //     cbgetprops(null, []);
-    // }
-
-    // createExtendedCollection(newName, resourceType, properties, cb) {
-    //     console.log("createextendedcollection",newName,resourceType, properties)
-    //     this.createChild(newName,true).then(child => {
-    //         cb(null, child)
-    //     })
-    // }
-
-    // async createFileStreamRaw(name, stream, enc, cbfscreatefile) {
-    //     console.log("createFileStreamRaw", name)
-    //     var child = await this.createChild(name, false)
-    //     var stream = new  BinaryStoreWriteStream(child)
-    //     stream.on("finish",() => {
-    //         console.log("upload done",stream.bytes_written)})
-
-    //     stream.pipe(stream);
-    // }
-
-    // async createFile(name, data, enc, cb) {
-    //     console.log("createFile", data.length)
-    //     //var child = await this.createChild(name, false)
-    //     //var stream = new  BinaryStoreWriteStream(child)
-    //     //stream.on("finish",() => {
-    //     //    console.log("upload done",stream.bytes_written)})
-    //     //if (data.length === 0) {
-    //     //     data = new Buffer(0);
-    //     //     enc  = "binary";
-    //     // }
-    //     // stream.write(data)
-    // }
 
 }
 
