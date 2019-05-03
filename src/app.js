@@ -14,6 +14,8 @@ const authPlugin = require('jsDAV/lib/DAV/plugins/auth');
 const authBackend = require('./auth');
 const inodesTree = require('./tree');
 
+var tree=inodesTree.new('/code/public/');
+
 async function start(listen) {
     // Make sure the database tables are up to date
     //    await models.sequelize.authenticate();
@@ -45,7 +47,7 @@ async function start(listen) {
 
         var jsdavServer=jsdav.mount({
             //node: __dirname + "/../public",
-            tree: inodesTree.new('/code/public/'),
+            tree: tree,
             server: httpServer,
             locksBackend: jsDAV_Locks_Backend_FS.new(__dirname + "/../locks"),
             authBackend: authBackend.new(),
@@ -54,15 +56,7 @@ async function start(listen) {
             standalone: false,
             plugins: [
                 authPlugin
-                     ],
-            //baseUri:
-            //tree:
-            //type:
-            //sandboxed: false
-
-            //realm:
-
-
+            ],
         })
 
         var listeners = httpServer.listeners("request");
@@ -86,4 +80,5 @@ async function start(listen) {
 module.exports= {
     start,
     models,
+    tree
 }

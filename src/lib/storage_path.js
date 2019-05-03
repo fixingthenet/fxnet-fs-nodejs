@@ -1,11 +1,14 @@
 const models = require('../models');
-const Exc = require("jsDAV/lib/shared/exceptions");
-//const BinaryStoreWriteStream = require("../binary_backends/binary_writer");
 
+// This works map paths to a bunch of inodes
+// or tries to do this (ensure).
+// It also allows modification
+// remove, createChild,
 
 class StoragePath {
     // inodes is optional but can drastically reduce
     // db accesses
+    //path is without !!!! leading '/'
     constructor(path, user, inodes,tree) {
         this.path=path;
         this.user = user;
@@ -14,37 +17,50 @@ class StoragePath {
 
         if (path=='') {
             this.path=''
-            this.path_parts=[]
+            this.path_parts=['/']
             this.name='/'
         } else {
-            this.path_parts=path.split('/')
+            this.path_parts=['/'].concat(path.split('/'))
             this.name=this.path_parts[this.path_parts.length-1]
         }
     }
 
-    async inodes() {
-        if (!this._inodes) {
-            this._inodes=await models.Inode.resolvePath('/'+this.path);
-        }
-        return this._inodes
-    }
-
     async isExisting() {
         var inodes=await this.inodes()
-        console.log("isExisting", inodes.length,
+        console.log("isExisting", inodes, inodes.length,
                     this.path, this.path_parts,
-                    this.path_parts.length+1)
-        return inodes.length == this.path_parts.length+1
+                    this.path_parts.length)
+        return inodes.length == this.path_parts.length
     }
 
-    async entry() {
-        var i=await this.inodes();
-        return i[i.length-1]
-    }
-
-    async storageKey() {
-        var e = await this.entry();
-        return e.storage_key
+    // ensures the existance of the path
+    // if isFolder is true then the resulting paath fill be a folder
+    // if not it will be an empty file with mimetype TBD???
+    async ensure(isFolder) {
+        var inodes=await this.inodes()
+        console.log("Inodes so far",inodes)
+        var existing_path_parts=[]
+        for (var i = 0; i < this.path_parts.length; i++) {
+            var dirname=this.path_parts[i]
+            console.log("looping",i,
+                        dirname,
+                        inodes[i],
+                        this.path_parts,
+                        existing_path_parts)
+            if (inodes[i]) {
+                existing_path_parts.push(dirname)
+            } else {
+                var new_child=await models.Inode.create(
+                    {name: dirname,
+                     parent_id: inodes[i-1].id,
+                     is_folder: true,
+                     created_at: new Date(),
+                     modified_at: new Date(),
+                     updated_at: new Date(),
+                    })
+                inodes.push(new_child)
+            }
+        }
     }
 
     async contentType() {
@@ -114,6 +130,24 @@ class StoragePath {
         var e = await this.entry();
         await e.update(atts)
         return this;
+    }
+
+    // low level functions
+    async inodes() {
+        if (!this._inodes) {
+            this._inodes=await models.Inode.resolvePath('/'+this.path);
+        }
+        return this._inodes
+    }
+
+    async entry() {
+        var i=await this.inodes();
+        return i[i.length-1]
+    }
+
+    async storageKey() {
+        var e = await this.entry();
+        return e.storage_key
     }
 
     _wrapInode(inode) {

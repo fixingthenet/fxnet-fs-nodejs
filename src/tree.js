@@ -1,28 +1,22 @@
-//var jsDAV_Tree = require("jsDAV/lib/DAV/tree");
-
 var jsDAV_Tree = require("jsDAV/lib/DAV/tree");
 
 var Exc = require("jsDAV/lib/shared/exceptions");
 var Util = require("jsDAV/lib/shared/util");
-const iFile = require("jsDAV/lib/DAV/interfaces/iFile");
-const iCollection = require("jsDAV/lib/DAV/interfaces/iCollection");
 
-//var jsDAV_FS_Directory = require("./directory");
-//var jsDAV_FS_File = require("./file");
 const FSFile=require('./frontends/dav/file');
 const FSDirectory=require('./frontends/dav/directory');
 const StoragePath=require('./lib/storage_path');
 
-var inodesTree = jsDAV_Tree.extend({
+// provides the level of linux tools like:
+// touch, cp -a, mv, rm -rf, mkdir -p
+var inodesTree = jsDAV_Tree.extend ({
 
    initialize(basePath) {
         this.basePath = basePath;
     },
 
     async getNodeForPath(path, cbfstree) {
-        //console.log("getNodeforPATH", path);
         var sp=new StoragePath(path,null,null,this);
-        //console.log("StroragPath", sp.path,sp.path_parts);
         var exists= await sp.isExisting()
         if (exists) {
             var isFolder = await sp.isFolder();
@@ -32,20 +26,38 @@ var inodesTree = jsDAV_Tree.extend({
             } else {
                 node = FSFile.new(sp)
             }
-            //console.log("Node", node.hasFeature(iFile), node.hasFeature(iCollection))
-            return cbfstree(null,node)
+            if (cbfstree) {
+                return cbfstree(null,node)
+            } else {
+                return node
+            }
         } else {
-                //console.log("doesn't exist", sp.path)
+            if (cbfstree) {
                 return cbfstree(new Exc.FileNotFound(`File at location ${path} not found`));
+            } else {
+                throw(new Exc.FileNotFound(`File at location ${path} not found`))
+            }
         }
     },
 
-    // another idea is to let the tree decide how
-    // to do things. but jsDav hast to be changed for this!
-
-
     // touch(path, size,mime_major,mime_minor, ecoding, key, sha512, created_at, modified_at )
-    // mkdir(path, created_at, modified_at )
+
+    // mkdir(path, parent, created_at, modified_at )
+    async mkdir(path, ensureParents, created_at, modified_at ) {
+        console.log("mkdir",path, ensureParents, created_at, modified_at);
+        var node =  new StoragePath(path, null, null, this);
+        var exists = await node.isExisting();
+        if (exists) {
+            if (await node.isFolder()) {
+                return node
+            } else {
+                throw "Is Existing but file"
+            }
+        } else {
+            node.ensure(true)
+            return node
+        }
+    },
     // read(path, start, end) -> stream
     // write(stream,path) -> ??? signal done
     // stat(path)
@@ -57,6 +69,7 @@ var inodesTree = jsDAV_Tree.extend({
         var sourceExists= await source.isExisting();
         var dest = new StoragePath(destName,null,null);
         var destExists= await dest.isExisting();
+
         // if the dest's parent doesn't exist then stop
         // if dest exists remove the dest
         // change the entry's name and it's parent
