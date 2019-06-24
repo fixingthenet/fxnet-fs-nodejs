@@ -19,7 +19,9 @@ var FSNode = iNode.extend({
     async "delete"(cb) {
         console.log("delete",this.storagePath.path)
         await this.storagePath.remove();
-        cb(null,null)
+        if (cb) {
+            cb(null,null)
+        }
     },
 
     getName() {
@@ -27,16 +29,24 @@ var FSNode = iNode.extend({
         return this.storagePath.name
     },
 
-    getLastModified(cb) {
+    async getLastModified(cb) {
         console.log("getLastModified",this.storagePath.path)
-        this.storagePath.entry().then(entry => {
-            console.log(entry.modified_at)
+        var entry=await this.storagePath.entry()
+        console.log(entry.modified_at)
+        if (cb) {
             cb(null,entry.modified_at)
-        })
+        } else {
+            return entry.modified_at
+        }
     },
 
     basePath() {
         return this.storagePath.tree.basePath
+    },
+
+    async moveToParent(newParent, newName) {
+        await this.storagePath.move(newParent.storagePath,
+                                    newName)
     }
 })
 

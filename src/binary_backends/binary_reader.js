@@ -16,8 +16,11 @@ class BinaryStoreReadStream extends EventEmitter {
 
     async init(){
         var path = await this.file.storagePath.storageKey();
-        var stream = Fs.createReadStream(this.file.basePath()+path,
+        var fullPath = this.file.basePath()+path;
+        var stream = Fs.createReadStream(fullPath,
                                          this.options);
+        console.log("BinaryStoreReadStream: init", fullPath, this.options)
+
         stream.on("data", (data) => {
             this.emit("data",data)
         });

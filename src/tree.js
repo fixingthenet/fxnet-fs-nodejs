@@ -40,6 +40,7 @@ var inodesTree = jsDAV_Tree.extend ({
         }
     },
 
+
     // touch(path, size,mime_major,mime_minor, ecoding, key, sha512, created_at, modified_at )
 
     // mkdir(path, parent, created_at, modified_at )
@@ -63,35 +64,24 @@ var inodesTree = jsDAV_Tree.extend ({
     // stat(path)
 
 
-    async move(sourceName, destName, cb) {
-        console.log("move",sourceName,destName)
-        var source = new StoragePath(sourceName,null,null);
-        var sourceExists= await source.isExisting();
-        var dest = new StoragePath(destName,null,null);
-        var destExists= await dest.isExisting();
+    async move(moveInfo) {
+        console.log("MOVE",moveInfo.source,moveInfo.destination)
+        if (moveInfo.destinationNode) {
+            console.log("Don't know what to do yet")
+        } else {
+            await moveInfo.sourceNode.moveToParent(moveInfo.destinationParentNode,
+                                             moveInfo.destinationName)
+        }
 
-        // if the dest's parent doesn't exist then stop
-        // if dest exists remove the dest
-        // change the entry's name and it's parent
-        // only move things I own? then move is expensive
-        // what's with the overwrite header?
-        // how to return problematic things
-
-        cb(null,null)
     },
 
-    async copy(sourceName, destName, cb) {
-        console.log("copy",sourceName,destName)
-        var source = new StoragePath(sourceName,null,null);
-        var sourceExists= await source.isExisting()
-        var dest = new StoragePath(destName,null,null);
-        var destExists= await dest.isExisting()
-        // how does copy work?
-        // merge the destination?
-        // what's with the overwrite header?
+    async copy(copyInfo) {
+        console.log("copy",copyInfo.source,copyInfo.destination)
+        var destExists= !!copyInfo.destinationNode
 
-        cb(null,null)
-    }
+
+
+    },
 
 })
 

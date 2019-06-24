@@ -15,7 +15,7 @@ class StoragePath {
         this._inodes=inodes;
         this.tree=tree;
 
-        if (path=='') {
+        if (path=='' || !path) {
             this.path=''
             this.path_parts=['/']
             this.name='/'
@@ -27,9 +27,9 @@ class StoragePath {
 
     async isExisting() {
         var inodes=await this.inodes()
-        console.log("isExisting", inodes, inodes.length,
-                    this.path, this.path_parts,
-                    this.path_parts.length)
+        //console.log("isExisting", inodes, inodes.length,
+        //            this.path, this.path_parts,
+        //            this.path_parts.length)
         return inodes.length == this.path_parts.length
     }
 
@@ -124,6 +124,20 @@ class StoragePath {
         } else {
             await e.destroy();
         }
+    }
+
+
+    async move(newParent, newName) {
+        // move each of them separately
+        var parentEntry= await newParent.entry();
+        var thisEntry = await this.entry();
+        console.log("StoragePath: move ", newParent, newName,
+                    parentEntry.id, thisEntry.id);
+        thisEntry.update({
+            parent_id: parentEntry.id,
+            name: newName
+        })
+        this._inodes=null;
     }
 
     async updateMetaContent(atts) {
