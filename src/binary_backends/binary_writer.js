@@ -61,6 +61,9 @@ class BinaryStoreWriteStream extends stream.Writable {
             content_type_minor: this.contentTypeMinor,
             content_type_charset: this.charset
         })
+        // and update the file
+        this.file.sha512 = this.etag;
+        // TBD update more
         console.log("binary:",
                     this.storageKey,
                     this.etag,
@@ -92,17 +95,17 @@ class BinaryStoreWriteStream extends stream.Writable {
             }
 
 
-            var entry = await this.file.storagePath.entry();
+            var inode = await this.file.storagePath.inode;
             var path = crypto.
                 createHash('md5').
-                update(entry.id).
+                update(inode.id).
                 digest('hex').
                 match(/(.{3})(.{3})(.{3})(.*)/).
                 slice(1,5);
 
             var dir = this.file.basePath()+path.slice(0,3).join('/');
 
-            this.storageKey=path.join('/')+'-'+entry.id;
+            this.storageKey=path.join('/')+'-'+inode.id;
             console.log("creating dir", path, dir, this.storageKey)
 
             fs.access(dir, (err) => {

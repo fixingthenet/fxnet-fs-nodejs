@@ -9,30 +9,42 @@ class BinaryStoreReadStream extends EventEmitter {
         this.start=start;
         this.end=end
 
-        var options;
+        this.options={};
         if (typeof start == "number" && typeof end == "number")
-            options = { start: start, end: end };
+            this.options = { start: start, end: end };
     }
+
+    pause() {
+        return this.stream.pause()
+    }
+
+    resume() {
+        return this.stream.resume()
+    }
+
+
+
 
     async init(){
         var path = await this.file.storagePath.storageKey();
         var fullPath = this.file.basePath()+path;
-        var stream = Fs.createReadStream(fullPath,
+        this.stream = Fs.createReadStream(fullPath,
                                          this.options);
-        console.log("BinaryStoreReadStream: init", fullPath, this.options)
+        console.log("BinaryStoreReadStream: init", fullPath, this.start, this.end, this.options)
 
-        stream.on("data", (data) => {
+        this.stream.on("data", (data) => {
             this.emit("data",data)
         });
 
-        stream.on("error", (err) => {
+        this.stream.on("error", (err) => {
             this.emit("error",err)
         });
 
-        stream.on("end", () => {
+        this.stream.on("end", () => {
             this.emit("end")
         });
     }
+
 
 
 }

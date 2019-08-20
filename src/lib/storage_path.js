@@ -1,4 +1,5 @@
 const models = require('../models');
+const asyncs = require("async");
 
 // This works map paths to a bunch of inodes
 // or tries to do this (ensure).
@@ -12,7 +13,7 @@ class StoragePath {
     constructor(path, user, inodes,tree) {
         this.path=path;
         this.user = user;
-        this._inodes=inodes;
+        this.inodes=inodes;
         this.tree=tree;
 
         if (path=='' || !path) {
@@ -20,89 +21,91 @@ class StoragePath {
             this.path_parts=['/']
             this.name='/'
         } else {
+            if (path.charAt(0) == '/')
+                path=path.substring(1);
             this.path_parts=['/'].concat(path.split('/'))
             this.name=this.path_parts[this.path_parts.length-1]
         }
     }
 
-    async isExisting() {
-        var inodes=await this.inodes()
-        //console.log("isExisting", inodes, inodes.length,
-        //            this.path, this.path_parts,
-        //            this.path_parts.length)
-        return inodes.length == this.path_parts.length
+    async initialize() {
+        if (!this.inodes)
+            this.inodes=await models.Inode.resolvePath('/'+this.path);
+        this._refresh()
     }
 
+    _refresh() {
+        this.isExisting=(this.inodes.length == this.path_parts.length)
+        if (this.isExisting) {
+            this.inode=this.inodes[this.inodes.length-1]
+            this.entry=this.inode
+        }
+    }
     // ensures the existance of the path
     // if isFolder is true then the resulting paath fill be a folder
     // if not it will be an empty file with mimetype TBD???
     async ensure(isFolder) {
-        var inodes=await this.inodes()
-        console.log("Inodes so far",inodes)
         var existing_path_parts=[]
         for (var i = 0; i < this.path_parts.length; i++) {
             var dirname=this.path_parts[i]
             console.log("looping",i,
                         dirname,
-                        inodes[i],
+                        this.inodes[i],
                         this.path_parts,
                         existing_path_parts)
-            if (inodes[i]) {
+            if (this.inodes[i]) {
                 existing_path_parts.push(dirname)
             } else {
                 var new_child=await models.Inode.create(
                     {name: dirname,
-                     parent_id: inodes[i-1].id,
+                     parent_id: this.inodes[i-1].id,
                      is_folder: true,
                      created_at: new Date(),
                      modified_at: new Date(),
                      updated_at: new Date(),
                     })
-                inodes.push(new_child)
+                this.inodes.push(new_child)
+                this._refresh()
             }
         }
     }
 
-    async contentType() {
-        var e = await this.entry()
-        return `${e.content_type_major}/${e.content_type_minor}`
+    contentType() {
+        this._throwNonExisting("Inode has no content type")
+        return `${this.inode.content_type_major}/${this.inode.content_type_minor}`
     }
 
-    async isFolder() {
-        var e=await this.entry()
-        return e.is_folder
+    isFolder() {
+        this._throwNonExisting("Inode doesn't know if it's a folder")
+        return this.inode.is_folder
     }
 
     async children() {
-        if (await this.isExisting()) {
-            var e=await this.entry()
-            if (e.is_folder) {
-                return (await e.children()).map(inodeChild => {
-                    return this._wrapInode(inodeChild)
-                })
-            } else {
-                return [] // or error?
-            }
-        } else {
-          return [] //or error?
-        }
+        this._throwNonExisting("doesn't have children")
+        if (!this.inode.is_folder)
+            throw("Only folder can have children")
+        var cs =await this.inode.children()
+        var wrappedCs = cs.map( (inodeChild) => {
+            return this._wrapInode(inodeChild)
+        })
+        console.log("wraped Children:", cs, wrappedCs)
+        return wrappedCs
     }
 
     async child(name) {
-        if (await this.isExisting()) {
-            var e=await this.entry()
-            if (e.is_folder) {
-                return this._wrapInode(await e.child(name))
-            }
-        }
+        this._throwNonExisting("doesn't have a child")
+        if (!this.inode.is_folder)
+            throw("Only folder can have children")
+
+        return this._wrapInode(await this.inode.child(name))
     }
 
     async createChild(name,isFolder) {
+        this._throwNonExisting("cant'create children")
         try {
-            var e=await this.entry()
             var child=await models.Inode.create(
                 {name: name,
-                 parent_id: e.id,
+                 parent_id: this.inode.id,
                  is_folder: isFolder,
                  created_at: new Date(),
                  modified_at: new Date(),
@@ -115,62 +118,61 @@ class StoragePath {
     }
 
     async remove() {
-        var e = await this.entry();
-        if (e.is_folder) {
+        this._throwNonExisting("can't be removed")
+        if (this.inode.is_folder) {
             //TBD: delete each of them so we can emit events
             // get the first 1000 deepest inodes
             // and destroy them
-            await models.Inode.deleteDescendants(e.id)
+            await models.Inode.deleteDescendants(this.inode.id)
         } else {
-            await e.destroy();
+            await this.inode.destroy();
+            this.inode=null //TBD: do it cleaner by poping from inodes
+            this.entry=null
+            this.isExisting=false
         }
     }
 
 
     async move(newParent, newName) {
         // move each of them separately
-        var parentEntry= await newParent.entry();
-        var thisEntry = await this.entry();
+        var parentEntry= newParent.inode;
+        var thisEntry = this.inode;
         console.log("StoragePath: move ", newParent, newName,
                     parentEntry.id, thisEntry.id);
         thisEntry.update({
             parent_id: parentEntry.id,
             name: newName
         })
-        this._inodes=null;
+        this.inodes=null; // TBD: cleaner!
+
     }
 
     async updateMetaContent(atts) {
-        var e = await this.entry();
-        await e.update(atts)
+        await this.inode.update(atts)
         return this;
     }
 
     // low level functions
-    async inodes() {
-        if (!this._inodes) {
-            this._inodes=await models.Inode.resolvePath('/'+this.path);
-        }
-        return this._inodes
-    }
-
-    async entry() {
-        var i=await this.inodes();
-        return i[i.length-1]
-    }
 
     async storageKey() {
-        var e = await this.entry();
-        return e.storage_key
+        return this.inode.storage_key
     }
 
     _wrapInode(inode) {
-        return new StoragePath(
+        var sp= new StoragePath(
             this.path+'/'+inode.name,
             this.user,
-            [].concat(this._inodes).concat([inode]),
+            [].concat(this.inodes).concat([inode]),
             this.tree
         )
+        sp._refresh()
+        return sp
+    }
+
+    _throwNonExisting(msg) {
+        if (!this.entry)
+            throw(`Non Existing node: ${msg}`)
+
     }
 
 }

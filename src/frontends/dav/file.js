@@ -6,47 +6,29 @@ const BinaryStoreWriteStream = require("../../binary_backends/binary_writer");
 var FSFile = FSNode.extend(iFile, {
     //put
     //get
-    getETag(cb) {
-        this.storagePath.entry().then(entry => {
-            cb(null,entry.sha512)
-        })
+    getETag() {
+       return this.inode.sha512
     },
 
-    getContentType(cb) {
-        this.storagePath.contentType().then(ct => {
-            cb(null,ct)
-        })
+    getContentType() {
+        return this.inode.contentType
     },
 
-    getSize(cb) {
-        this.storagePath.entry().then(entry => {
-            cb(null,entry.content_size)
-        })
+    getSize() {
+        this.inode.content_size
     },
 
-    async getStream(start, end, cb) {
+    async getStream(start, end) {
         var stream = new BinaryStoreReadStream(this,
                                                start,
                                                end)
         await stream.init();
-
-        stream.on("data", function(data) {
-            cb(null, data);
-        });
-
-        stream.on("error", function(err) {
-            cb(err);
-        });
-
-        stream.on("end", function() {
-            cb();
-        });
-
+        return stream
     },
 
-    async putStream(handler, enc, cb) {
+    async putStream() {
         console.debug("putStream", this.storagePath.path);
-        var size = handler.httpRequest.headers["x-file-size"];
+//        var size = handler.httpRequest.headers["x-file-size"];
 
 
 //        if (size) {
@@ -56,17 +38,15 @@ var FSFile = FSNode.extend(iFile, {
 //            cb(Exc.FileNotFound('ups'))
 //        } else {
         var stream = new BinaryStoreWriteStream(this)
-            await stream.init();
-            stream.on("finish",() => {
-                stream.destroy();
-            })
-            stream.on("close",async () => {
-                stream.closing()
-                console.log("upload done (close)")
-            })
-
-            handler.getRequestBody(enc, stream, true, cb);
-//        }
+        await stream.init();
+        stream.on("finish",() => {
+            stream.destroy();
+        })
+        stream.on("close",async () => {
+            stream.closing()
+            console.log("upload done (close)")
+        })
+        return stream;
     }
 })
 

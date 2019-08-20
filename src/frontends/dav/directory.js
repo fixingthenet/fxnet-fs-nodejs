@@ -17,27 +17,21 @@ var FSDirectory = FSNode.extend(iCollection,
     //createFile
     //createDirectory
     //exists
-    getChild(name,cb) {
-        this.storagePath.child(name).then(child => {
-            cb(null,this._wrapStoragePath(child))
-        }).catch(e => {
-            cb(Exc.FileNotFound(`File not found`))
-        })
+    async getChild(name) {
+        var child= await this.storagePath.child(name)
+        return this._wrapStoragePath(child)
     },
 
-    async getChildren(cb) {
-        console.log("getChildren",this.storagePath.path)
-        var children= await this.storagePath.children()
-        async.map(children,
-                  this._wrapStoragePath,
-                  cb)
+    async getChildren() {
+        var children = await this.storagePath.children()
+        console.log("children:",children)
+        return children.map(this._wrapStoragePath)
     },
 
     //iQuota
-    async getQuotaInfo(cb) {
+    async getQuotaInfo() {
         // used, available,
-        var entry = this.storagePath.entry()
-        cb(null,[400,8000000000])
+        return Promise.resolve([400,8000000000])
     },
 
 // iHref
@@ -47,38 +41,36 @@ var FSDirectory = FSNode.extend(iCollection,
 //   },
 
 
-     async createExtendedCollection(newName, resourceType, properties, cb) {
+     async createExtendedCollection(newName, resourceType, properties) {
          console.log("createextendedcollection",newName,
                      resourceType, properties)
          var child = await this.storagePath.createChild(newName,true)
          if (child) {
-             cb( null, child)
+             return
          } else {
-             cb(Exc.Conflict(newName), null)
+             throw(Exc.Conflict(newName))
          }
      },
 
 
-      async createFileStream(handler, name,enc,cb) {
-          console.debug("createFileStream",
-                        this.storagePath.path,
-                        name, enc);
-          var childStoragePath = await this.storagePath.createChild(name, false);
-          var child = await this._wrapStoragePath(childStoragePath);
-          return child.putStream(handler, enc, cb);
-    },
+   async createFile(name) {
+       console.debug("createFile",
+                     this.storagePath.path,
+                     name);
+       var childStoragePath = await this.storagePath.createChild(name, false);
+       var child = this._wrapStoragePath(childStoragePath);
+       return child
+   },
 
-    async _wrapStoragePath(sp) {
-        var isFolder = await sp.isFolder();
-        console.log("Wrapping",sp.name,isFolder)
+    _wrapStoragePath(sp) {
+        var isFolder = sp.isFolder();
+        console.log("Wrapping",sp.name,isFolder,sp.inode)
         if (isFolder) {
             return FSDirectory.new(sp)
         } else {
             return FSFile.new(sp)
         }
     }
-
-
 
 })
 

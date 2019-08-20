@@ -17,11 +17,10 @@ var inodesTree = jsDAV_Tree.extend ({
 
     async getNodeForPath(path, cbfstree) {
         var sp=new StoragePath(path,null,null,this);
-        var exists= await sp.isExisting()
-        if (exists) {
-            var isFolder = await sp.isFolder();
+        await sp.initialize()
+        if (sp.inode) {
             var node;
-            if (isFolder) {
+            if (sp.isFolder()) {
                 node = FSDirectory.new(sp)
             } else {
                 node = FSFile.new(sp)
@@ -47,15 +46,15 @@ var inodesTree = jsDAV_Tree.extend ({
     async mkdir(path, ensureParents, created_at, modified_at ) {
         console.log("mkdir",path, ensureParents, created_at, modified_at);
         var node =  new StoragePath(path, null, null, this);
-        var exists = await node.isExisting();
-        if (exists) {
-            if (await node.isFolder()) {
+        await sp.initialize()
+        if (sp.inode) {
+            if (node.isFolder()) {
                 return node
             } else {
                 throw "Is Existing but file"
             }
         } else {
-            node.ensure(true)
+            await node.ensure(true)
             return node
         }
     },
