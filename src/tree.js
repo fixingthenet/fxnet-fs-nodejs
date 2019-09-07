@@ -68,10 +68,10 @@ var inodesTree = jsDAV_Tree.extend ({
         if (moveInfo.destinationNode) {
             console.log("Don't know what to do yet")
         } else {
-            await moveInfo.sourceNode.moveToParent(moveInfo.destinationParentNode,
-                                             moveInfo.destinationName)
+            await moveInfo.sourceNode.moveToParent(
+                moveInfo.destinationParentNode,
+                moveInfo.destinationName)
         }
-
     },
 
     async copy(copyInfo) {

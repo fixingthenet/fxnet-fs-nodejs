@@ -48,11 +48,11 @@ class StoragePath {
         var existing_path_parts=[]
         for (var i = 0; i < this.path_parts.length; i++) {
             var dirname=this.path_parts[i]
-            console.log("looping",i,
-                        dirname,
-                        this.inodes[i],
-                        this.path_parts,
-                        existing_path_parts)
+//            console.log("looping",i,
+            //                        dirname,
+            //          this.inodes[i],
+            //          this.path_parts,
+            //          existing_path_parts)
             if (this.inodes[i]) {
                 existing_path_parts.push(dirname)
             } else {
@@ -76,8 +76,12 @@ class StoragePath {
     }
 
     isFolder() {
+        // we treat nonexistinent things as folders
         this._throwNonExisting("Inode doesn't know if it's a folder")
-        return this.inode.is_folder
+        //if (this.isExisting)
+            return this.inode.is_folder
+        //else
+        //    return true
     }
 
     async children() {
@@ -88,7 +92,7 @@ class StoragePath {
         var wrappedCs = cs.map( (inodeChild) => {
             return this._wrapInode(inodeChild)
         })
-        console.log("wraped Children:", cs, wrappedCs)
+        //        console.log("wraped Children:", cs, wrappedCs)
         return wrappedCs
     }
 
@@ -134,11 +138,12 @@ class StoragePath {
 
 
     async move(newParent, newName) {
+        this._throwNonExisting("can't be moved")
         // move each of them separately
         var parentEntry= newParent.inode;
         var thisEntry = this.inode;
-        console.log("StoragePath: move ", newParent, newName,
-                    parentEntry.id, thisEntry.id);
+//        console.log("StoragePath: move ", newParent, newName,
+//                    parentEntry.id, thisEntry.id);
         thisEntry.update({
             parent_id: parentEntry.id,
             name: newName
@@ -159,6 +164,7 @@ class StoragePath {
     }
 
     _wrapInode(inode) {
+//        console.log("wrapping:", this)
         var sp= new StoragePath(
             this.path+'/'+inode.name,
             this.user,

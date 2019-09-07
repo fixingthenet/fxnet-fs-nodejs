@@ -24,7 +24,7 @@ var FSDirectory = FSNode.extend(iCollection,
 
     async getChildren() {
         var children = await this.storagePath.children()
-        console.log("children:",children)
+//        console.log("children:",children)
         return children.map(this._wrapStoragePath)
     },
 
@@ -46,7 +46,7 @@ var FSDirectory = FSNode.extend(iCollection,
                      resourceType, properties)
          var child = await this.storagePath.createChild(newName,true)
          if (child) {
-             return
+             return child
          } else {
              throw(Exc.Conflict(newName))
          }
@@ -64,7 +64,7 @@ var FSDirectory = FSNode.extend(iCollection,
 
     _wrapStoragePath(sp) {
         var isFolder = sp.isFolder();
-        console.log("Wrapping",sp.name,isFolder,sp.inode)
+//        console.log("Wrapping",sp.name,isFolder,sp.inode)
         if (isFolder) {
             return FSDirectory.new(sp)
         } else {
