@@ -15,7 +15,7 @@ var FSFile = FSNode.extend(iFile, {
     },
 
     getSize() {
-        this.inode.content_size
+        return this.inode.content_size
     },
 
     async getStream(start, end) {
