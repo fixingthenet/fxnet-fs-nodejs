@@ -16,12 +16,12 @@
     "graphql-relay": "^0.5.5",
     "graphql-sequelize": "^9.0.4",
     "graphql.js": "^0.6.1",
-    "jsDAV": "^0.3.4",
+    "jsDAV": "https://github.com/pschrammel/jsDAV.git#async2",
     "jsonwebtoken": "^8.4.0",
     "mmmagic": "^0.5.2",
     "morgan": "^1.9.1",
     "pg": "^7.5.0",
-    "sequelize": "^4.41.0",
+    "sequelize": "^4.44.3",
     "sequelize-cli": "^5.2.0"
   },
   "devDependencies": {

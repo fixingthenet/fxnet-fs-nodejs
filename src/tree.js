@@ -76,10 +76,9 @@ var inodesTree = jsDAV_Tree.extend ({
 
     async copy(copyInfo) {
         console.log("copy",copyInfo.source,copyInfo.destination)
-        var destExists= !!copyInfo.destinationNode
-
-
-
+        await copyInfo.sourceNode.copyToParent(
+            copyInfo.destinationParentNode,
+            copyInfo.destinationName)
     },
 
 })

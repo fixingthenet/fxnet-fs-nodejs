@@ -33,6 +33,11 @@ var FSNode = iNode.extend({
     async moveToParent(newParent, newName) {
         await this.storagePath.move(newParent.storagePath,
                                     newName)
+    },
+
+    async copyToParent(newParent, newName) {
+        await this.storagePath.copy(newParent.storagePath,
+                                    newName)
     }
 })
 

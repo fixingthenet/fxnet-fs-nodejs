@@ -144,12 +144,23 @@ class StoragePath {
         var thisEntry = this.inode;
 //        console.log("StoragePath: move ", newParent, newName,
 //                    parentEntry.id, thisEntry.id);
-        thisEntry.update({
+        await thisEntry.update({
             parent_id: parentEntry.id,
             name: newName
         })
-        this.inodes=null; // TBD: cleaner!
+        this.inodes=null;
+        await this.initialize();
+        //TBD: move the backend files
+    }
 
+
+    async copy(newParent, newName) {
+        this._throwNonExisting("can't be moved")
+        // move each of them separately
+        var parentInode= newParent.inode;
+        console.log("StoragePath: copy ", newName)
+        await this.inode.copy(parentInode, newName)
+        // TBD copy the backend
     }
 
     async updateMetaContent(atts) {

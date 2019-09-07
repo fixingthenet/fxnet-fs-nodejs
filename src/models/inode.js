@@ -46,7 +46,22 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'inodes',
 //        deletedAt: 'deleted_at'
     }
+
                                   );
+    Inode.prototype.copy= async function(parentInode, name) {
+        if (!this.is_folder) {
+            var attributes = this.get({plain: true})
+            delete(attributes.id)
+            attributes.parent_id=parentInode.id;
+            attributes.name=name;
+            console.log("attributes:", attributes)
+            return await Inode.create(attributes)
+        } else {
+            throw "don't know how to copy folders"
+        }
+    }
+
+
     Inode.prototype.child= async function(name) {
         if (this.is_folder) {
             return await Inode.findOne({where: {parent_id: this.id,
@@ -56,8 +71,8 @@ module.exports = (sequelize, DataTypes) => {
         } else {
             throw "Only folder have children."
         }
-
     }
+
     Inode.prototype.children = async function()  {
         if (this.is_folder) {
             return await Inode.findAll({where: {parent_id: this.id,
