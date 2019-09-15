@@ -1,7 +1,9 @@
 const iFile = require("jsDAV/lib/DAV/interfaces/iFile");
 const FSNode = require("./node");
-const BinaryStoreReadStream = require('../../binary_backends/binary_reader.js')
-const BinaryStoreWriteStream = require("../../binary_backends/binary_writer");
+//const BinaryStoreReadStream = require('../../binary_backends/binary_reader.js')
+//const BinaryStoreWriteStream = require("../../binary_backends/binary_writer");
+const Backend = require('../../backends/hashedLocal.js')
+
 
 var FSFile = FSNode.extend(iFile, {
     //put
@@ -19,10 +21,10 @@ var FSFile = FSNode.extend(iFile, {
     },
 
     async getStream(start, end) {
-        var stream = new BinaryStoreReadStream(this,
+        var backend = new Backend()
+        var stream = await backend.readStream(this,
                                                start,
                                                end)
-        await stream.init();
         return stream
     },
 
@@ -36,9 +38,10 @@ var FSFile = FSNode.extend(iFile, {
             //    handler.httpRequest.headers["x-file-name"] = name;
             //            this.writeFileChunk(handler, enc, cbfscreatefile);
 //            cb(Exc.FileNotFound('ups'))
-//        } else {
-        var stream = new BinaryStoreWriteStream(this)
-        await stream.init();
+        //        } else {
+        var backend = new Backend()
+        var stream = await backend.writeStream(this);
+
         stream.on("finish",() => {
             stream.destroy();
         })

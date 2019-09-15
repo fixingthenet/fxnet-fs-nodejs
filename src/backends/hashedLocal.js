@@ -1,17 +1,63 @@
+const EventEmitter = require('events');
 const util = require('util');
-const fs = require('fs');
-const fsp = require('fs').promises;
-
 const stream = require('stream');
-const crypto = require('crypto')
-var mmm = require('mmmagic'),
-    Magic = mmm.Magic;
+const crypto = require('crypto');
+const Fs = require('fs');
+const Fsp = require('fs').promises;
 
+var mmm = require('mmmagic');
+var Magic = mmm.Magic;
 var magic = new Magic(mmm.MAGIC_MIME_TYPE |
                       mmm.MAGIC_MIME_ENCODING);
 
 const MAX_BYTES=20000;
 const contentTypeRegexp =/(.*?)\/(.*?); charset=(.*)/
+
+
+class BinaryStoreReadStream extends EventEmitter {
+    constructor(file,start,end) { //options: start,end
+        //super({emitClose: true});
+        super();
+        this.file=file;
+        this.start=start;
+        this.end=end
+
+        this.options={};
+        if (typeof start == "number" && typeof end == "number")
+            this.options = { start: start, end: end };
+    }
+
+    pause() {
+        return this.stream.pause()
+    }
+
+    resume() {
+        return this.stream.resume()
+    }
+
+
+
+
+    async init(){
+        var path = await this.file.storagePath.storageKey();
+        var fullPath = this.file.basePath()+path;
+        this.stream = Fs.createReadStream(fullPath,
+                                         this.options);
+        console.log("BinaryStoreReadStream: init", fullPath, this.start, this.end, this.options)
+
+        this.stream.on("data", (data) => {
+            this.emit("data",data)
+        });
+
+        this.stream.on("error", (err) => {
+            this.emit("error",err)
+        });
+
+        this.stream.on("end", () => {
+            this.emit("end")
+        });
+    }
+}
 
 class BinaryStoreWriteStream extends stream.Writable {
     constructor(file) {
@@ -27,10 +73,14 @@ class BinaryStoreWriteStream extends stream.Writable {
 
     async init() {
         await this._storageKey()
-        this.fd=await fsp.open(this.file.basePath()+this.storageKey,'w')
+        var destination = this.file.basePath()+this.storageKey;
+        console.log("destination:", destination);
+        this.fd=await Fsp.open(destination,'w')
     }
 
     async _write(chunk, enc, next) {
+
+        //we save the first bytes for analysis (mmagic)
         if (this.bytes_written < MAX_BYTES) {
             this.firstBytes.write(chunk.toString('ascii'), 'ascii')
             console.log("Wrote firstBytes",
@@ -108,10 +158,10 @@ class BinaryStoreWriteStream extends stream.Writable {
             this.storageKey=path.join('/')+'-'+inode.id;
             console.log("creating dir", path, dir, this.storageKey)
 
-            fs.access(dir, (err) => {
+            Fs.access(dir, (err) => {
                 if (err) {
                     console.log("creating dir", dir)
-                    fs.mkdir(dir, { recursive: true }, (err) => {
+                    Fs.mkdir(dir, { recursive: true }, (err) => {
                         console.log("created dir",err)
                         resolve(this.storageKey);
                     })
@@ -124,4 +174,23 @@ class BinaryStoreWriteStream extends stream.Writable {
     }
 }
 
-module.exports = BinaryStoreWriteStream;
+
+class HashedLocal {
+    constructor(backend) {
+
+    }
+
+    async readStream(file, start, end) {
+        var stream =  new BinaryStoreReadStream(file,start,end);
+        await stream.init()
+        return stream;
+    }
+
+    async writeStream(file) {
+        var stream =  new BinaryStoreWriteStream(file);
+        await stream.init()
+        return stream;
+    }
+}
+
+module.exports= HashedLocal
