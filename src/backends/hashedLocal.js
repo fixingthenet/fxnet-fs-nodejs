@@ -15,9 +15,10 @@ const contentTypeRegexp =/(.*?)\/(.*?); charset=(.*)/
 
 
 class BinaryStoreReadStream extends EventEmitter {
-    constructor(file,start,end) { //options: start,end
+    constructor(backend,file,start,end) { //options: start,end
         //super({emitClose: true});
         super();
+        this.backend = backend;
         this.file=file;
         this.start=start;
         this.end=end
@@ -40,7 +41,7 @@ class BinaryStoreReadStream extends EventEmitter {
 
     async init(){
         var path = await this.file.storagePath.storageKey();
-        var fullPath = this.file.basePath()+path;
+        var fullPath = this.backend.config.base+path;
         this.stream = Fs.createReadStream(fullPath,
                                          this.options);
         console.log("BinaryStoreReadStream: init", fullPath, this.start, this.end, this.options)
@@ -60,8 +61,9 @@ class BinaryStoreReadStream extends EventEmitter {
 }
 
 class BinaryStoreWriteStream extends stream.Writable {
-    constructor(file) {
+    constructor(backend,file) {
         super({emitClose: true});
+        this.backend = backend;
         this.file=file
         this.firstBytes = new Buffer.alloc(MAX_BYTES*2)
         this.shasum = crypto.createHash('sha512');
@@ -73,7 +75,7 @@ class BinaryStoreWriteStream extends stream.Writable {
 
     async init() {
         await this._storageKey()
-        var destination = this.file.basePath()+this.storageKey;
+        var destination = this.backend.config.base+this.storageKey;
         console.log("destination:", destination);
         this.fd=await Fsp.open(destination,'w')
     }
@@ -153,7 +155,7 @@ class BinaryStoreWriteStream extends stream.Writable {
                 match(/(.{3})(.{3})(.{3})(.*)/).
                 slice(1,5);
 
-            var dir = this.file.basePath()+path.slice(0,3).join('/');
+            var dir = this.backend.config.base+path.slice(0,3).join('/');
 
             this.storageKey=path.join('/')+'-'+inode.id;
             console.log("creating dir", path, dir, this.storageKey)
@@ -176,17 +178,18 @@ class BinaryStoreWriteStream extends stream.Writable {
 
 
 class HashedLocal {
-    constructor() {
+    constructor(config) {
+        this.config=config
     }
 
     async readStream(file, start, end) {
-        var stream =  new BinaryStoreReadStream(file,start,end);
+        var stream =  new BinaryStoreReadStream(this, file,start,end);
         await stream.init()
         return stream;
     }
 
     async writeStream(file) {
-        var stream =  new BinaryStoreWriteStream(file);
+        var stream =  new BinaryStoreWriteStream(this, file);
         await stream.init()
         return stream;
     }

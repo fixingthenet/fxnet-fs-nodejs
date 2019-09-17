@@ -57,6 +57,11 @@ var FSDirectory = FSNode.extend(iCollection,
        console.debug("createFile",
                      this.storagePath.path,
                      name);
+       var backend = await this.storagePath.backend()
+
+       if (!backend.writeStream)
+           throw( new Exc.Forbidden('The backend can not handle files.'))
+
        var childStoragePath = await this.storagePath.createChild(name, false);
        var child = this._wrapStoragePath(childStoragePath);
        return child

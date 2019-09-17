@@ -1,5 +1,6 @@
 const models = require('../models');
 const asyncs = require("async");
+const Backends = require('../backends');
 
 // This works map paths to a bunch of inodes
 // or tries to do this (ensure).
@@ -68,6 +69,19 @@ class StoragePath {
                 this._refresh()
             }
         }
+    }
+
+
+    async backend() {
+        var backendInode
+        this._throwNonExisting("no backend")
+        this.inodes.forEach((inode) => {
+            if (!!inode.backend_id) {
+                backendInode = inode
+            }
+        })
+        var backend = await backendInode.getBackend();
+        return Backends.instance(backend.backendType, backend.params);
     }
 
     contentType() {

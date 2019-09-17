@@ -4,6 +4,9 @@ module.exports = (sequelize, DataTypes) => {
         parent_id: {
             type: DataTypes.BIGINT
         },
+        backend_id: {
+            type: DataTypes.BIGINT
+        },
         name: {
             type: DataTypes.STRING
         },
@@ -131,5 +134,11 @@ module.exports = (sequelize, DataTypes) => {
         return inodesPath;
     }
 
+
+    Inode.associate = function(models) {
+        console.log("Assoc: Inode -> Backend", models.Backend.name)
+        Inode.Backend=Inode.belongsTo(models.Backend, {foreignKey: 'backend_id',
+                                                       as: 'backend'});
+    };
     return Inode;
 };

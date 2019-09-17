@@ -12,7 +12,6 @@ var FSNode = iNode.extend({
     //setName
     //exists
 
-
     async "delete"() {
         console.log("delete",this.storagePath.path)
         await this.storagePath.remove();
@@ -24,10 +23,6 @@ var FSNode = iNode.extend({
 
     getLastModified() {
         return this.inode.modified_at
-    },
-
-    basePath() {
-        return this.storagePath.tree.basePath
     },
 
     async moveToParent(newParent, newName) {

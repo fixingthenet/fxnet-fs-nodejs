@@ -11,6 +11,11 @@ class Backends {
     get(name) {
         return this._backends[name]
     }
+
+    instance(name, config) {
+        var klass = this.get(name)
+        return (new klass(config))
+    }
 }
 
 
