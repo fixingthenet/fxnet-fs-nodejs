@@ -176,8 +176,7 @@ class BinaryStoreWriteStream extends stream.Writable {
 
 
 class HashedLocal {
-    constructor(backend) {
-
+    constructor() {
     }
 
     async readStream(file, start, end) {
@@ -192,5 +191,7 @@ class HashedLocal {
         return stream;
     }
 }
+
+HashedLocal.name='HashedLocal'
 
 module.exports= HashedLocal

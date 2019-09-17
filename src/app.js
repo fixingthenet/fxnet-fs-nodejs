@@ -13,8 +13,13 @@ const jsDAV_Locks_Backend_FS = require("jsDAV/lib/DAV/plugins/locks/fs");
 const authPlugin = require('jsDAV/lib/DAV/plugins/auth');
 const authBackend = require('./auth');
 const inodesTree = require('./tree');
+const Backends = require('./backends');
 
 var tree=inodesTree.new('/code/public/');
+
+Backends.register(require('./backends/hashedLocal'));
+Backends.register(require('./backends/justMeta'));
+
 
 async function start(listen) {
     // Make sure the database tables are up to date
