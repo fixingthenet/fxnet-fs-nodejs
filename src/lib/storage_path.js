@@ -74,14 +74,22 @@ class StoragePath {
 
     async backend() {
         var backendInode
+        var downPath=[]
         this._throwNonExisting("no backend")
         this.inodes.forEach((inode) => {
-            if (!!inode.backend_id) {
+            if (inode.backend_id) {
                 backendInode = inode
+                downPath=[]
+            } else {
+                downPath.push(inode.name)
             }
         })
+
         var backend = await backendInode.getBackend();
-        return Backends.instance(backend.backendType, backend.params);
+        var config = Object.assign({}, backend.params)
+        config.downPath=downPath.join('/')
+        console.log("Instanciating Backend", backend.backendType, config)
+        return Backends.instance(backend.backendType, config);
     }
 
     contentType() {

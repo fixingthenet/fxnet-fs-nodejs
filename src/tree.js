@@ -11,10 +11,13 @@ const StoragePath=require('./lib/storage_path');
 // touch, cp -a, mv, rm -rf, mkdir -p
 var inodesTree = jsDAV_Tree.extend ({
 
-   initialize(basePath) {
+    initialize(basePath) {
         this.basePath = basePath;
     },
 
+    // nodes can be files or collections
+    // files implement:
+    // collections
     async getNodeForPath(path, cbfstree) {
         var sp=new StoragePath(path,null,null,this);
         await sp.initialize()
@@ -39,28 +42,32 @@ var inodesTree = jsDAV_Tree.extend ({
         }
     },
 
-
-    // touch(path, size,mime_major,mime_minor, ecoding, key, sha512, created_at, modified_at )
-
-    // mkdir(path, parent, created_at, modified_at )
-    async mkdir(path, ensureParents, created_at, modified_at ) {
-        console.log("mkdir",path, ensureParents, created_at, modified_at);
-        var node =  new StoragePath(path, null, null, this);
-        await sp.initialize()
-        if (sp.inode) {
-            if (node.isFolder()) {
-                return node
-            } else {
-                throw "Is Existing but file"
-            }
-        } else {
-            await node.ensure(true)
-            return node
-        }
+    readFile(node, start, end) {
+        return node.getStream(start, end)
     },
-    // read(path, start, end) -> stream
-    // write(stream,path) -> ??? signal done
-    // stat(path)
+
+    delete(node) {
+        return node["delete"]()
+    },
+
+    getChildren(parent) {
+        return parent.getChildren()
+    },
+
+    async createFile(parent, name, node) {
+        if (!node)
+            var node = await parent.createFile(name)
+        var stream= await node.putStream();
+        return { stream: stream, node: node }
+    },
+
+    async mkdir(parent, name, resourceType, properties ) {
+        var backend=await parent.storagePath.backend()
+        if (backend.mkdir) {
+            await backend.mkdir(name,resourceType, properties)
+        }
+        return await parent.createExtendedCollection(name, resourceType, properties);
+    },
 
 
     async move(moveInfo) {

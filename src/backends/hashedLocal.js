@@ -180,6 +180,7 @@ class BinaryStoreWriteStream extends stream.Writable {
 class HashedLocal {
     constructor(config) {
         this.config=config
+        console.log("HashedLocal:", config)
     }
 
     async readStream(file, start, end) {

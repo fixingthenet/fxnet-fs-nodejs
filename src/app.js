@@ -19,7 +19,7 @@ var tree=inodesTree.new('/code/public/');
 
 Backends.register(require('./backends/hashedLocal'));
 Backends.register(require('./backends/justMeta'));
-
+Backends.register(require('./backends/mirroredLocal'));
 
 async function start(listen) {
     // Make sure the database tables are up to date
@@ -68,7 +68,7 @@ async function start(listen) {
         httpServer.removeAllListeners("request");
         httpServer.addListener("request", function(req, resp) {
             var path = Url.parse(req.url).pathname;
-            console.log("Path", path);
+//            console.log("Path", path);
             if (path.charAt(path.length - 1) != "/")
                 path = path + "/";
             if (path.match(/^\/api\/|^\/graphql\//)) { // exlude our paths here
