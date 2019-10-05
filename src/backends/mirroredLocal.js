@@ -167,9 +167,10 @@ class MirroredLocal {
     async mkdir(name, resourceType, properties) {
         var dir = this.config.base + this.config.downPath+'/'+ name;
         console.log("MirroredLocal",dir,  resourceType, properties)
-        Fs.mkdir(dir, { recursive: true }, (err) => {
-            console.log("created dir",err)
-        })
+        Fsp.mkdir(dir, { recursive: true })
+        if (this.config.uid && this.config.gid) {
+            await Fsp.chown(dir, this.config.uid, this.config.gid)
+        }
     }
 
     async move() {
