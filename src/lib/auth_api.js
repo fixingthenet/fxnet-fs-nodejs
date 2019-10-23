@@ -19,11 +19,12 @@ const authApi = function(token) {
 
 const q={
     login: function(vars) {
-    var res=authApi(null).mutate(`
+
+        return authApi(null).mutate(`
      sessionLogin(login: $login, password: $password) {
         token errors {...errors}}`)(vars)
-    return res
-  },
+
+    },
     changePassword: function(token,vars) {
     var res=authApi(token).mutate(`
      changePassword(login: $login,

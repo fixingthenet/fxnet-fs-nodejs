@@ -14,7 +14,6 @@ const authPlugin = require('jsDAV/lib/DAV/plugins/auth');
 const authBackend = require('./auth');
 const inodesTree = require('./tree');
 const Backends = require('./backends');
-
 var tree=inodesTree.new('/code/public/');
 
 Backends.register(require('./backends/hashedLocal'));
@@ -37,11 +36,9 @@ async function start(listen) {
 //        res.send('GET request to homepage');
 //    });
 
-
     app.get('/api/health.json', (req,res) => {
         res.send(JSON.stringify({ "success": true}))
     })
-
 
     if (listen) {
         var httpServer=app.listen(options,() => {
@@ -67,11 +64,12 @@ async function start(listen) {
         var listeners = httpServer.listeners("request");
         httpServer.removeAllListeners("request");
         httpServer.addListener("request", function(req, resp) {
+            req.pause()
             var path = Url.parse(req.url).pathname;
-//            console.log("Path", path);
+//            console.log("Path", path, httpServer.listeners.length);
             if (path.charAt(path.length - 1) != "/")
                 path = path + "/";
-            if (path.match(/^\/api\/|^\/graphql\//)) { // exlude our paths here
+            if (path.match(/^\/api\/|^\/graphql\//)) { // add non jsdav paths here
                 for (var i = 0, len = listeners.length; i < len; ++i)
                     listeners[i].call(httpServer, req, resp);
             } else {

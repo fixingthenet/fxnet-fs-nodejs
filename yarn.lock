@@ -464,10 +464,10 @@ async@^2.6.2:
   dependencies:
     lodash "^4.17.14"
 
-asyncjs@0.0.10:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/asyncjs/-/asyncjs-0.0.10.tgz#50dbbfefb8b2df2ffa9c9e9e8bd58887bc3c1518"
-  integrity sha1-UNu/77iy3y/6nJ6ei9WIh7w8FRg=
+asyncjs@0.0.13:
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/asyncjs/-/asyncjs-0.0.13.tgz#9a39605cdbcab1283737039d4da14310b6d91c6f"
+  integrity sha512-ZwrkJ1zbf+LMmFKbb9DylLdcf30HaJ/6vxv/2Yx0Dt/aW8cxWlwNPlBsPB3WUnu9dpbVzjWgp6ix6DdnecUhwg==
 
 babel-code-frame@^6.26.0:
   version "6.26.0"
@@ -1506,10 +1506,10 @@ find-up@^3.0.0:
   dependencies:
     locate-path "^3.0.0"
 
-formidable@1.0.17:
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/formidable/-/formidable-1.0.17.tgz#ef5491490f9433b705faa77249c99029ae348559"
-  integrity sha1-71SRSQ+UM7cF+qdyScmQKa40hVk=
+formidable@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/formidable/-/formidable-1.2.1.tgz#70fb7ca0290ee6ff961090415f4b3df3d2082659"
+  integrity sha512-Fs9VRguL0gqGHkXS5GQiMCr1VhZBxz0JnJs4JmMp/2jL18Fmbzvv7vOFRU+U8TBkHEE/CX1qDXzJplVULgsLeg==
 
 forwarded@~0.1.2:
   version "0.1.2"
@@ -1859,10 +1859,11 @@ js-tokens@^3.0.2:
 
 "jsDAV@https://github.com/pschrammel/jsDAV.git#async2":
   version "0.3.4"
-  resolved "https://github.com/pschrammel/jsDAV.git#b07e1936e751facc93331b0c6d315b05a616a7d4"
+  resolved "https://github.com/pschrammel/jsDAV.git#19e197f45d14fd2f7a112ccbad9bd416fb2f2405"
   dependencies:
-    asyncjs "0.0.10"
-    formidable "1.0.17"
+    asyncjs "0.0.13"
+    body-parser "1.19.0"
+    formidable "1.2.1"
     moment "2.11.1"
     xmldom "0.1.21"
     xpath "0.0.21"
