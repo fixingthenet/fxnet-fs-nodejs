@@ -11,14 +11,15 @@ const StoragePath=require('./lib/storage_path');
 // touch, cp -a, mv, rm -rf, mkdir -p
 var inodesTree = jsDAV_Tree.extend ({
 
-    initialize(basePath) {
-        this.basePath = basePath;
+    initialize(handler) {
+        this.handler=handler
     },
 
     // nodes can be files or collections
     // files implement:
     // collections
     async getNodeForPath(path, cbfstree) {
+        console.log("auth", this.handler.plugins.auth.authBackend.getCurrentUser())
         var sp=new StoragePath(path,null,null,this);
         await sp.initialize()
         if (sp.inode) {
@@ -46,22 +47,23 @@ var inodesTree = jsDAV_Tree.extend ({
         return node.getStream(start, end)
     },
 
-    delete(node) {
-        return node["delete"]()
-    },
-
-    getChildren(parent) {
-        return parent.getChildren()
-    },
-
-    async createFile(parent, name, node) {
+    async writeFile(parent, name, node) {
         if (!node)
             var node = await parent.createFile(name)
         var stream= await node.putStream();
         return { stream: stream, node: node }
     },
 
-    async mkdir(parent, name, resourceType, properties ) {
+    delete(node) {
+        return node["delete"]()
+    },
+
+    lsDir(parent) {
+        return parent.getChildren()
+    },
+
+
+    async mkDir(parent, name, resourceType, properties ) {
         var backend=await parent.storagePath.backend()
         if (backend.mkdir) {
             await backend.mkdir(name,resourceType, properties)

@@ -14,7 +14,7 @@ const authPlugin = require('jsDAV/lib/DAV/plugins/auth');
 const authBackend = require('./auth');
 const inodesTree = require('./tree');
 const Backends = require('./backends');
-var tree=inodesTree.new('/code/public/');
+var tree=inodesTree;
 
 Backends.register(require('./backends/hashedLocal'));
 Backends.register(require('./backends/justMeta'));
@@ -55,6 +55,7 @@ async function start(listen) {
             authBackend: authBackend.new(),
             realm: "test",
             mount: '/',
+            sandboxed: false,
             standalone: false,
             plugins: [
                 authPlugin
