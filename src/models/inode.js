@@ -31,6 +31,15 @@ module.exports = (sequelize, DataTypes) => {
         content_size: {
             type: DataTypes.BIGINT
         },
+        readers: {
+            type: DataTypes.ARRAY(DataTypes.STRING)
+        },
+        writers: {
+            type: DataTypes.ARRAY(DataTypes.STRING)
+        },
+        admins: {
+            type: DataTypes.ARRAY(DataTypes.STRING)
+        },
         created_at: {
             type: DataTypes.DATE
         },
