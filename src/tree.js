@@ -7,39 +7,25 @@ const FSFile=require('./frontends/dav/file');
 const FSDirectory=require('./frontends/dav/directory');
 const StoragePath=require('./lib/storage_path');
 
+const jwt=require('jsonwebtoken')
+const fs = require('fs')
+var publicKey= fs.readFileSync('config/secrets/cert.pem')
 // provides the level of linux tools like:
 // touch, cp -a, mv, rm -rf, mkdir -p
 var inodesTree = jsDAV_Tree.extend ({
 
     initialize(handler) {
         this.handler=handler
+
     },
 
-    // nodes can be files or collections
-    // files implement:
-    // collections
-    async getNodeForPath(path, cbfstree) {
-        console.log("auth", this.handler.plugins.auth.authBackend.getCurrentUser())
+    async getNodeForPath(path) {
         var sp=new StoragePath(path,null,null,this);
         await sp.initialize()
         if (sp.inode) {
-            var node;
-            if (sp.isFolder()) {
-                node = FSDirectory.new(sp)
-            } else {
-                node = FSFile.new(sp)
-            }
-            if (cbfstree) {
-                return cbfstree(null,node)
-            } else {
-                return node
-            }
+            return FSDirectory.wrap(sp, this)
         } else {
-            if (cbfstree) {
-                return cbfstree(new Exc.FileNotFound(`File at location ${path} not found`));
-            } else {
-                throw(new Exc.FileNotFound(`File at location ${path} not found`))
-            }
+            throw(new Exc.FileNotFound(`File at location ${path} not found`))
         }
     },
 
@@ -68,7 +54,10 @@ var inodesTree = jsDAV_Tree.extend ({
         if (backend.mkdir) {
             await backend.mkdir(name,resourceType, properties)
         }
-        return await parent.createExtendedCollection(name, resourceType, properties);
+        return await parent.createExtendedCollection(name,
+                                                     resourceType,
+                                                     properties
+                                                    );
     },
 
 
@@ -88,6 +77,23 @@ var inodesTree = jsDAV_Tree.extend ({
         await copyInfo.sourceNode.copyToParent(
             copyInfo.destinationParentNode,
             copyInfo.destinationName)
+    },
+
+    userContext() {
+        if (this.userCtx)
+            return this.userCtx
+
+        try {
+            var token=this.handler.plugins.auth.authBackend.getCurrentUser().sessionLogin.token
+            var jwtc = jwt.verify(token, publicKey)
+            console.log("auth", token,jwtc)
+            this.userCtx = {user: jwtc.user}
+        } catch(e) {
+            this.userCtx = { user: {id: 0, login: "guest"}}
+            console.error("Getting authentificiation failed:",e)
+        }
+
+        return this.userCtx
     },
 
 })

@@ -4,6 +4,13 @@ const FSNode = require("./node");
 var FSFile = FSNode.extend(iFile, {
     //put
     //get
+
+    async "delete"() {
+        this.writeAllowed()
+        await this.storagePath.remove();
+    },
+
+
     getETag() {
        return this.inode.sha512
     },
@@ -17,12 +24,14 @@ var FSFile = FSNode.extend(iFile, {
     },
 
     async getStream(start, end) {
+        this.readAllowed()
         var backend = await this.storagePath.backend()
         var stream = await backend.readStream(this,start, end)
         return stream
     },
 
     async putStream() {
+        this.writeAllowed()
         //        console.debug("putStream", this.storagePath.path);
         var backend = await this.storagePath.backend()
         var stream = await backend.writeStream(this)

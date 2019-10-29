@@ -12,36 +12,30 @@ var FSDirectory = FSNode.extend(iCollection,
                                 iExtendedCollection,
                                 {
 
-    //iCollection
+    async "delete"() {
+        //var children=await this.getChildren()
+        this.writeAllowed()
+        await this.storagePath.remove();
+    },
 
-    //createFile
-    //createDirectory
-    //exists
     async getChild(name) {
+        this.readAllowed()
         var child= await this.storagePath.child(name)
-        return this._wrapStoragePath(child)
+        return FSDirectory.wrap(child, this.tree)
     },
 
     async getChildren() {
+        this.readAllowed()
         var children = await this.storagePath.children()
-//        console.log("children:",children)
-        return children.map(this._wrapStoragePath)
+        return children.map( (child) => {return FSDirectory.wrap(child, this.tree)})
     },
 
-    //iQuota
     async getQuotaInfo() {
-        // used, available,
         return Promise.resolve([400,8000000000])
     },
 
-// iHref
-//    async getHref(cb) {
-//        console.log("getHref")
-//        cb(path)
-//   },
-
-
-     async createExtendedCollection(newName, resourceType, properties) {
+    async createExtendedCollection(newName, resourceType, properties) {
+         this.writeAllowed()
          console.log("createextendedcollection",newName,
                      resourceType, properties)
          var child = await this.storagePath.createChild(newName,true)
@@ -53,31 +47,27 @@ var FSDirectory = FSNode.extend(iCollection,
      },
 
 
-   async createFile(name) {
-       console.debug("createFile",
-                     this.storagePath.path,
-                     name);
+     async createFile(name) {
+       this.writeAllowed()
        var backend = await this.storagePath.backend()
 
        if (!backend.writeStream)
            throw( new Exc.Forbidden('The backend can not handle files.'))
 
        var childStoragePath = await this.storagePath.createChild(name, false);
-       var child = this._wrapStoragePath(childStoragePath);
+         var child = FSDirectory.wrap(childStoragePath, this.tree);
        return child
    },
 
-    _wrapStoragePath(sp) {
-        var isFolder = sp.isFolder();
-//        console.log("Wrapping",sp.name,isFolder,sp.inode)
-        if (isFolder) {
-            return FSDirectory.new(sp)
-        } else {
-            return FSFile.new(sp)
-        }
-    }
-
 })
 
+// wrap is only used by directory AND tree!
+FSDirectory.wrap=function(sp, tree) {
+    if (sp.isFolder()) {
+        return FSDirectory.new(sp, tree)
+    } else {
+        return FSFile.new(sp, tree)
+    }
+}
 
 module.exports = FSDirectory;

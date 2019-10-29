@@ -136,6 +136,9 @@ class StoragePath {
                  created_at: new Date(),
                  modified_at: new Date(),
                  updated_at: new Date(),
+                 readers: this.inode.readers,
+                 writers: this.inode.writers,
+                 admins: this.inode.admins
                 })
             return this._wrapInode(child)
         } catch(e) {
