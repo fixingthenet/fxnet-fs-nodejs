@@ -54,10 +54,10 @@ var inodesTree = jsDAV_Tree.extend ({
         if (backend.mkdir) {
             await backend.mkdir(name,resourceType, properties)
         }
-        return await parent.createExtendedCollection(name,
-                                                     resourceType,
-                                                     properties
-                                                    );
+        return await parent.createDirectory(name,
+                                            resourceType,
+                                            properties
+                                           );
     },
 
 

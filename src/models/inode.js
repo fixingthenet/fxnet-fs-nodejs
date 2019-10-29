@@ -1,4 +1,6 @@
 'use strict';
+const Sequelize = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
     const Inode = sequelize.define('Inode', {
         parent_id: {
@@ -74,7 +76,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
 
-    Inode.prototype.child= async function(name) {
+/*    Inode.prototype.child= async function(name) {
         if (this.is_folder) {
             return await Inode.findOne({where: {parent_id: this.id,
                                                 name: name,
@@ -83,17 +85,19 @@ module.exports = (sequelize, DataTypes) => {
         } else {
             throw "Only folder have children."
         }
-    }
+    }*/
 
-    Inode.prototype.children = async function()  {
+    Inode.prototype.children = async function(userCtx)  {
         if (this.is_folder) {
             return await Inode.findAll({where: {parent_id: this.id,
-                                                deleted_at: null
+                                                deleted_at: null,
+                                                admins: {[Sequelize.Op.overlap]:[userCtx.user.id.toString()]}
                                                }})
         } else {
             throw "Only folder have children."
         }
     }
+
     Inode.deleteDescendants = async function(id) {
         await sequelize.query(`
             WITH RECURSIVE inodes_full AS (

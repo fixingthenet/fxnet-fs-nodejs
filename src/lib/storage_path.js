@@ -110,7 +110,7 @@ class StoragePath {
         this._throwNonExisting("doesn't have children")
         if (!this.inode.is_folder)
             throw("Only folder can have children")
-        var cs =await this.inode.children()
+        var cs =await this.inode.children(this.tree.userContext())
         var wrappedCs = cs.map( (inodeChild) => {
             return this._wrapInode(inodeChild)
         })
@@ -118,13 +118,13 @@ class StoragePath {
         return wrappedCs
     }
 
-    async child(name) {
+/*    async child(name) {
         this._throwNonExisting("doesn't have a child")
         if (!this.inode.is_folder)
             throw("Only folder can have children")
 
         return this._wrapInode(await this.inode.child(name))
-    }
+    }*/
 
     async createChild(name,isFolder) {
         this._throwNonExisting("cant'create children")

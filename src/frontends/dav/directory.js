@@ -18,11 +18,11 @@ var FSDirectory = FSNode.extend(iCollection,
         await this.storagePath.remove();
     },
 
-    async getChild(name) {
+/*    async getChild(name) {
         this.readAllowed()
         var child= await this.storagePath.child(name)
         return FSDirectory.wrap(child, this.tree)
-    },
+    },*/
 
     async getChildren() {
         this.readAllowed()
@@ -34,7 +34,7 @@ var FSDirectory = FSNode.extend(iCollection,
         return Promise.resolve([400,8000000000])
     },
 
-    async createExtendedCollection(newName, resourceType, properties) {
+    async createDirectory(newName, resourceType, properties) {
          this.writeAllowed()
          console.log("createextendedcollection",newName,
                      resourceType, properties)
