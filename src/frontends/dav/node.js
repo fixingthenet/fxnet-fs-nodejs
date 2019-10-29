@@ -29,7 +29,9 @@ var FSNode = iNode.extend({
 
     readAllowed() {
         var readers = this.storagePath.inode.readers
-        if (readers.indexOf(this.tree.userContext().user.id.toString())>=0) {
+        var admins = this.storagePath.inode.admins
+        if (admins.indexOf(this.tree.userContext().user.id.toString())>=0 ||
+            readers.indexOf(this.tree.userContext().user.id.toString())>=0) {
         } else {
             throw( new Exc.Forbidden('You are not allowed to read this.'))
         }
@@ -37,7 +39,9 @@ var FSNode = iNode.extend({
 
     writeAllowed() {
         var writers = this.storagePath.inode.writers
-        if (writers.indexOf(this.tree.userContext().user.id.toString())>=0) {
+        var admins = this.storagePath.inode.admins
+        if (admins.indexOf(this.tree.userContext().user.id.toString())>=0 ||
+            writers.indexOf(this.tree.userContext().user.id.toString())>=0) {
         } else {
             throw( new Exc.Forbidden('You are not allowed to change this.'))
         }

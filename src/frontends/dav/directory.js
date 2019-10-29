@@ -57,7 +57,7 @@ var FSDirectory = FSNode.extend(iCollection,
        var childStoragePath = await this.storagePath.createChild(name, false);
          var child = FSDirectory.wrap(childStoragePath, this.tree);
        return child
-   },
+     },
 
 })
 
