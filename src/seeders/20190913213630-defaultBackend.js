@@ -6,7 +6,7 @@ module.exports = {
                                        [{
                                            name: 'defaultRootBackend',
                                            params: '{}',
-                                           backendType: 'JustMeta',
+                                           backend_type: 'JustMeta',
                                            created_at: new Date(),
                                        }], {});
 

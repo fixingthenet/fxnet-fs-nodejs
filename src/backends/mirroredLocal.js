@@ -41,11 +41,12 @@ class BinaryStoreReadStream extends EventEmitter {
 
     async init(){
         // storageKey!!!
-        var path = await this.file.storagePath.storageKey();
-        var fullPath = path;
+        var path = await this.file.storagePath.storageKey()
+        var fullPath=this.backend.config.base+path
+//        console.log("BinaryStoreReadStream: init", fullPath, this.start, this.end, this.options)
         this.stream = Fs.createReadStream(fullPath,
                                          this.options);
-        console.log("BinaryStoreReadStream: init", fullPath, this.start, this.end, this.options)
+
 
         this.stream.on("data", (data) => {
             this.emit("data",data)
@@ -77,7 +78,7 @@ class BinaryStoreWriteStream extends stream.Writable {
     async init() {
         this.storageKey = this.calcStorageKey()
         var destination = this.storageKey;
-        console.log("destination:", destination);
+//        console.log("destination:", destination);
         this.fd=await Fsp.open(destination,'w')
     }
 
@@ -86,8 +87,7 @@ class BinaryStoreWriteStream extends stream.Writable {
         //we save the first bytes for analysis (mmagic)
         if (this.bytes_written < MAX_BYTES) {
             this.firstBytes.write(chunk.toString('ascii'), 'ascii')
-            console.log("Wrote firstBytes",
-                        this.firstBytes.length)
+//            console.log("Wrote firstBytes", this.firstBytes.length)
 
         }
 
@@ -107,7 +107,7 @@ class BinaryStoreWriteStream extends stream.Writable {
         this.contentTypeMinor=cmatch[2];
         this.charset=cmatch[3];
         await this.file.storagePath.updateMetaContent({
-            storage_key: this.storageKey,
+            storage_key: this.backend.config.downPath,
             sha512: this.etag,
             content_size: this.bytes_written,
             content_type_major: this.contentTypeMajor,
@@ -166,7 +166,7 @@ class MirroredLocal {
 
     async mkdir(name, resourceType, properties) {
         var dir = this.config.base + this.config.downPath+'/'+ name;
-        console.log("MirroredLocal",dir,  resourceType, properties)
+//        console.log("MirroredLocal",dir,  resourceType, properties)
         Fsp.mkdir(dir, { recursive: true })
         if (this.config.uid && this.config.gid) {
             await Fsp.chown(dir, this.config.uid, this.config.gid)

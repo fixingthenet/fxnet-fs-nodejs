@@ -88,8 +88,8 @@ class StoragePath {
         var backend = await backendInode.getBackend();
         var config = Object.assign({}, backend.params)
         config.downPath=downPath.join('/')
-        console.log("Instanciating Backend", backend.backendType, config)
-        return Backends.instance(backend.backendType, config);
+//        console.log("Instanciating Backend", backend.backend_type, config)
+        return Backends.instance(backend.backend_type, config);
     }
 
     contentType() {
@@ -127,7 +127,7 @@ class StoragePath {
     }*/
 
     async createChild(name,isFolder) {
-        this._throwNonExisting("cant'create children")
+        this._throwNonExisting("can't create children")
         try {
             var child=await models.Inode.create(
                 {name: name,
@@ -142,6 +142,7 @@ class StoragePath {
                 })
             return this._wrapInode(child)
         } catch(e) {
+            //console.log("createChild failed", e)
             return null
         }
     }
@@ -183,7 +184,7 @@ class StoragePath {
         this._throwNonExisting("can't be moved")
         // move each of them separately
         var parentInode= newParent.inode;
-        console.log("StoragePath: copy ", newName)
+//        console.log("StoragePath: copy ", newName)
         await this.inode.copy(parentInode, newName)
         // TBD copy the backend
     }

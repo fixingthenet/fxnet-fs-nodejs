@@ -42,7 +42,8 @@ var FSDirectory = FSNode.extend(iCollection,
          if (child) {
              return child
          } else {
-             throw(Exc.Conflict(newName))
+//             console.log("Conflict", newName)
+             throw(new Exc.Conflict(newName))
          }
      },
 

@@ -19,7 +19,7 @@ module.exports = {
                     type: Sequelize.JSONB,
                     default: '{}'
                 },
-                backendType: {
+                backend_type: {
                     type: Sequelize.STRING(),
                     allowNull: false,
                 },

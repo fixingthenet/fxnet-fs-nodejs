@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
                                          params: {
                                              type: DataTypes.JSONB
                                          },
-                                         backendType: {
+                                         backend_type: {
                                              type: DataTypes.STRING
                                          },
                                          created_at: {
