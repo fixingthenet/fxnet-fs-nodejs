@@ -128,7 +128,6 @@ class StoragePath {
 
     async createChild(name,isFolder) {
         this._throwNonExisting("can't create children")
-        try {
             var child=await models.Inode.create(
                 {name: name,
                  parent_id: this.inode.id,
@@ -141,10 +140,6 @@ class StoragePath {
                  admins: this.inode.admins
                 })
             return this._wrapInode(child)
-        } catch(e) {
-            //console.log("createChild failed", e)
-            return null
-        }
     }
 
     async remove() {

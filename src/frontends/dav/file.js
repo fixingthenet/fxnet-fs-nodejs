@@ -40,7 +40,7 @@ var FSFile = FSNode.extend(iFile, {
             stream.destroy();
         })
         stream.on("close",async () => {
-            stream.closing()
+            await stream.closing()
 //            console.log("upload done (close)")
         })
         return stream;

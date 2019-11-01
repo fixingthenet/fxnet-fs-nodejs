@@ -40,10 +40,10 @@ var FSDirectory = FSNode.extend(iCollection,
                      resourceType, properties)
          var child = await this.storagePath.createChild(newName,true)
          if (child) {
-             return child
+             return FSDirectory.wrap(child, this.tree)
          } else {
 //             console.log("Conflict", newName)
-             throw(new Exc.Conflict(newName))
+             throw(new Exc.MethodNotAllowed(newName))
          }
      },
 

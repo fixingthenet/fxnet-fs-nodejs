@@ -63,20 +63,38 @@ var inodesTree = jsDAV_Tree.extend ({
 
     async move(moveInfo) {
         console.log("MOVE",moveInfo.source,moveInfo.destination)
-        if (moveInfo.destinationNode) {
-            console.log("Don't know what to do yet")
-        } else {
-            await moveInfo.sourceNode.moveToParent(
-                moveInfo.destinationParentNode,
-                moveInfo.destinationName)
+        if (moveInfo.destinationExists) {
+            await this["delete"](moveInfo.destinationNode)
         }
+        await this.walk(moveInfo.sourceNode,
+                        moveInfo.destinationParentNode,
+                        moveInfo.destinationName
+                       )
     },
 
     async copy(copyInfo) {
-        console.log("copy",copyInfo.source,copyInfo.destination)
-        await copyInfo.sourceNode.copyToParent(
-            copyInfo.destinationParentNode,
-            copyInfo.destinationName)
+        console.log("COPY",copyInfo.source,copyInfo.destination)
+        if (copyInfo.destinationExists) {
+            await this["delete"](copyInfo.destinationNode)
+        }
+        await this.walk(copyInfo.sourceNode,
+                        copyInfo.destinationParentNode,
+                        copyInfo.destinationName
+                       )
+    },
+
+    async walk(node,destParentNode, name) {
+        if (node.getSize) { //file
+            console.log("copy file", node.path(), destParentNode.path(), name)
+            var dest = await destParentNode.createFile(name)
+        } else {
+            console.log("copy  dir", node.path(), destParentNode.path(), name)
+            var dest = await destParentNode.createDirectory(name)
+            children=await node.getChildren()
+            children.forEach( async (node)=>{
+                await this.walk(node,dest,node.getName())
+            })
+        }
     },
 
     userContext() {
