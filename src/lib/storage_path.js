@@ -82,7 +82,7 @@ class StoragePath {
         var wrappedCs = await Promise.all(cs.map( async (inodeChild) => {
             return await this._wrapInode(inodeChild)
         }))
-                console.log("wraped Children:", cs, wrappedCs)
+//                console.log("wraped Children:", cs, wrappedCs)
         return wrappedCs
     }
 
@@ -137,8 +137,9 @@ class StoragePath {
             parent_id: parentEntry.id,
             name: newName
         })
-        this.inodes=null;
-        await this.initialize();
+        this.inodes=null
+        this.path=newParent.path+'/'+newName
+        await this.initialize(true);
         //TBD: move the backend files
     }
 
