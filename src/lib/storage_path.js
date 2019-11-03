@@ -11,66 +11,34 @@ class StoragePath {
     // inodes is optional but can drastically reduce
     // db accesses
     //path is without !!!! leading '/'
-    constructor(path, user, inodes,tree) {
-        this.path=path;
-        this.user = user;
-        this.inodes=inodes;
-        this.tree=tree;
+    constructor(path, tree, inodes) {
+        this.path=path
+        this.tree=tree
+        this.inodes=inodes //optional for speedup
 
-        if (path=='' || !path) {
+    }
+
+    async initialize(force) {
+        if (this.path=='' || !this.path) {
             this.path=''
             this.path_parts=['/']
             this.name='/'
         } else {
-            if (path.charAt(0) == '/')
-                path=path.substring(1);
-            this.path_parts=['/'].concat(path.split('/'))
+            if (this.path.charAt(0) == '/')
+                this.path=this.path.substring(1);
+            this.path_parts=['/'].concat(this.path.split('/'))
             this.name=this.path_parts[this.path_parts.length-1]
         }
-    }
 
-    async initialize() {
-        if (!this.inodes)
+        if (force || !this.inodes)
             this.inodes=await models.Inode.resolvePath('/'+this.path);
-        this._refresh()
-    }
 
-    _refresh() {
         this.isExisting=(this.inodes.length == this.path_parts.length)
         if (this.isExisting) {
             this.inode=this.inodes[this.inodes.length-1]
             this.entry=this.inode
         }
     }
-    // ensures the existance of the path
-    // if isFolder is true then the resulting paath fill be a folder
-    // if not it will be an empty file with mimetype TBD???
-    async ensure(isFolder) {
-        var existing_path_parts=[]
-        for (var i = 0; i < this.path_parts.length; i++) {
-            var dirname=this.path_parts[i]
-//            console.log("looping",i,
-            //                        dirname,
-            //          this.inodes[i],
-            //          this.path_parts,
-            //          existing_path_parts)
-            if (this.inodes[i]) {
-                existing_path_parts.push(dirname)
-            } else {
-                var new_child=await models.Inode.create(
-                    {name: dirname,
-                     parent_id: this.inodes[i-1].id,
-                     is_folder: true,
-                     created_at: new Date(),
-                     modified_at: new Date(),
-                     updated_at: new Date(),
-                    })
-                this.inodes.push(new_child)
-                this._refresh()
-            }
-        }
-    }
-
 
     async backend() {
         var backendInode
@@ -111,10 +79,10 @@ class StoragePath {
         if (!this.inode.is_folder)
             throw("Only folder can have children")
         var cs =await this.inode.children(this.tree.userContext())
-        var wrappedCs = cs.map( (inodeChild) => {
-            return this._wrapInode(inodeChild)
-        })
-        //        console.log("wraped Children:", cs, wrappedCs)
+        var wrappedCs = await Promise.all(cs.map( async (inodeChild) => {
+            return await this._wrapInode(inodeChild)
+        }))
+                console.log("wraped Children:", cs, wrappedCs)
         return wrappedCs
     }
 
@@ -139,7 +107,7 @@ class StoragePath {
                  writers: this.inode.writers,
                  admins: this.inode.admins
                 })
-            return this._wrapInode(child)
+            return await this._wrapInode(child)
     }
 
     async remove() {
@@ -157,7 +125,7 @@ class StoragePath {
         }
     }
 
-
+    //move to a new parent or rename it
     async move(newParent, newName) {
         this._throwNonExisting("can't be moved")
         // move each of them separately
@@ -195,15 +163,14 @@ class StoragePath {
         return this.inode.storage_key
     }
 
-    _wrapInode(inode) {
+    async _wrapInode(inode) {
 //        console.log("wrapping:", this)
         var sp= new StoragePath(
             this.path+'/'+inode.name,
-            this.user,
-            [].concat(this.inodes).concat([inode]),
-            this.tree
+            this.tree,
+            [].concat(this.inodes).concat([inode])
         )
-        sp._refresh()
+        await sp.initialize()
         return sp
     }
 

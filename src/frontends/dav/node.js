@@ -21,7 +21,7 @@ var FSNode = iNode.extend({
         return this.inode.modified_at
     },
 
-   /* async moveToParent(newParent, newName) {
+    async moveToParent(newParent, newName) {
         await this.storagePath.move(newParent.storagePath,
                                     newName)
     },
@@ -29,7 +29,7 @@ var FSNode = iNode.extend({
     async copyToParent(newParentNode, newName) {
         await this.storagePath.copy(newParent.storagePath,
                                     newName)
-    },*/
+    },
 
     readAllowed() {
         var readers = this.storagePath.inode.readers

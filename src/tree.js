@@ -20,7 +20,7 @@ var inodesTree = jsDAV_Tree.extend ({
     },
 
     async getNodeForPath(path) {
-        var sp=new StoragePath(path,null,null,this);
+        var sp=new StoragePath(path,this);
         await sp.initialize()
         if (sp.inode) {
             return FSDirectory.wrap(sp, this)
@@ -63,27 +63,42 @@ var inodesTree = jsDAV_Tree.extend ({
 
     async move(moveInfo) {
         console.log("MOVE",moveInfo.source,moveInfo.destination)
-        if (moveInfo.destinationExists) {
-            await this["delete"](moveInfo.destinationNode)
-        }
-        await this.walk(moveInfo.sourceNode,
+        await this.recursiveMove(moveInfo.sourceNode,
                         moveInfo.destinationParentNode,
                         moveInfo.destinationName
-                       )
+                                )
+        var backendSrc=await moveInfo.sourceNode.storagePath.backend()
+        var backendDestParent=await moveInfo.destinationParentNode.storagePath.backend()
+        if (backendSrc.id != backendDestParent.id)
+            throw( new Exc.NotImplemented('Cross backend move not implemented'))
+
+
+
+    },
+
+    async recursiveMove(node,destParentNode, name) {
+        if (node.getSize) { //file
+            console.log("move file", node.path(), destParentNode.path(), name)
+            var dest = await node.moveToParent(destParentNode, name)
+        } else {
+            console.log("move  dir", node.path(), destParentNode.path(), name)
+            var dest = await node.moveToParent(destParentNode, name)
+            children=await node.getChildren()
+            children.forEach( async (node)=>{
+                await this.recursiveMove(node,dest,node.getName())
+            })
+        }
     },
 
     async copy(copyInfo) {
         console.log("COPY",copyInfo.source,copyInfo.destination)
-        if (copyInfo.destinationExists) {
-            await this["delete"](copyInfo.destinationNode)
-        }
-        await this.walk(copyInfo.sourceNode,
+        await this.recursiveCopy(copyInfo.sourceNode,
                         copyInfo.destinationParentNode,
                         copyInfo.destinationName
                        )
     },
 
-    async walk(node,destParentNode, name) {
+    async recursiveCopy(node,destParentNode, name) {
         if (node.getSize) { //file
             console.log("copy file", node.path(), destParentNode.path(), name)
             var dest = await destParentNode.createFile(name)
@@ -92,7 +107,7 @@ var inodesTree = jsDAV_Tree.extend ({
             var dest = await destParentNode.createDirectory(name)
             children=await node.getChildren()
             children.forEach( async (node)=>{
-                await this.walk(node,dest,node.getName())
+                await this.recursiveCopy(node,dest,node.getName())
             })
         }
     },
@@ -104,7 +119,7 @@ var inodesTree = jsDAV_Tree.extend ({
         try {
             var token=this.handler.plugins.auth.authBackend.getCurrentUser().sessionLogin.token
             var jwtc = jwt.verify(token, publicKey)
-            console.log("auth", token,jwtc)
+//            console.log("auth", token,jwtc)
             this.userCtx = {user: jwtc.user}
         } catch(e) {
             this.userCtx = { user: {id: 0, login: "guest"}}
