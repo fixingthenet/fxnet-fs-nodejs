@@ -112,17 +112,19 @@ class StoragePath {
 
     async remove() {
         this._throwNonExisting("can't be removed")
-        if (this.inode.is_folder) {
+        //if (this.inode.is_folder) {
             //TBD: delete each of them so we can emit events
             // get the first 1000 deepest inodes
             // and destroy them
-            await models.Inode.deleteDescendants(this.inode.id)
-        } else {
-            await this.inode.destroy();
-            this.inode=null //TBD: do it cleaner by poping from inodes
-            this.entry=null
-            this.isExisting=false
-        }
+        //    await models.Inode.deleteDescendants(this.inode.id)
+        //} else {
+        var backend=await this.backend()
+        await backend.remove()
+        await this.inode.destroy();
+        this.inode=null //TBD: do it cleaner by poping from inodes
+        this.entry=null
+        this.isExisting=false
+        //}
     }
 
     //move to a new parent or rename it
@@ -131,6 +133,11 @@ class StoragePath {
         // move each of them separately
         var parentEntry= newParent.inode;
         var thisEntry = this.inode;
+        var newPath=newParent.path+'/'+newName
+
+        var srcBackend= await this.backend()
+        var destBackend= await newParent.backend()
+        await srcBackend.move(destBackend.config.downPath+newName)
 //        console.log("StoragePath: move ", newParent, newName,
 //                    parentEntry.id, thisEntry.id);
         await thisEntry.update({
@@ -138,9 +145,8 @@ class StoragePath {
             name: newName
         })
         this.inodes=null
-        this.path=newParent.path+'/'+newName
+        this.path=newPath
         await this.initialize(true);
-        //TBD: move the backend files
     }
 
 

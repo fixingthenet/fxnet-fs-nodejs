@@ -41,8 +41,7 @@ class BinaryStoreReadStream extends EventEmitter {
 
     async init(){
         // storageKey!!!
-        var path = await this.file.storagePath.storageKey()
-        var fullPath=this.backend.config.base+path
+        var fullPath=this.backend.config.base+this.backend.config.downPath
 //        console.log("BinaryStoreReadStream: init", fullPath, this.start, this.end, this.options)
         this.stream = Fs.createReadStream(fullPath,
                                          this.options);
@@ -73,13 +72,13 @@ class BinaryStoreWriteStream extends stream.Writable {
         this.etag=null;
         this.contentType = '';
         this.bytes_written=0;
+        this.fullPath=this.backend.config.base+this.backend.config.downPath
     }
 
     async init() {
-        this.storageKey = this.calcStorageKey()
-        var destination = this.storageKey;
+
 //        console.log("destination:", destination);
-        this.fd=await Fsp.open(destination,'w')
+        this.fd=await Fsp.open(this.fullPath,'w')
     }
 
     async _write(chunk, enc, next) {
@@ -107,7 +106,6 @@ class BinaryStoreWriteStream extends stream.Writable {
         this.contentTypeMinor=cmatch[2];
         this.charset=cmatch[3];
         await this.file.storagePath.updateMetaContent({
-            storage_key: this.backend.config.downPath,
             sha512: this.etag,
             content_size: this.bytes_written,
             content_type_major: this.contentTypeMajor,
@@ -118,7 +116,6 @@ class BinaryStoreWriteStream extends stream.Writable {
         this.file.sha512 = this.etag;
         // TBD update more
         console.log("binary:",
-                    this.storageKey,
                     this.etag,
                     this.bytes_written,
                     this.contentType,
@@ -148,8 +145,15 @@ class BinaryStoreWriteStream extends stream.Writable {
 
 
 class MirroredLocal {
+    // config has:
+    // base: base path
+    // downPath (the path from base down the tree)
+    // uid
+    // gid
+
     constructor(config) {
         this.config=config
+        this.config.fullPath=this.config.base + this.config.downPath
     }
 
     async readStream(file, start, end) {
@@ -165,23 +169,32 @@ class MirroredLocal {
     }
 
     async mkdir(name, resourceType, properties) {
-        var dir = this.config.base + this.config.downPath+'/'+ name;
-//        console.log("MirroredLocal",dir,  resourceType, properties)
+        var dir = this.config.base + this.config.downPath+'/'+name;
+        console.log("MirroredLocal",dir,  resourceType, properties)
         Fsp.mkdir(dir, { recursive: true })
         if (this.config.uid && this.config.gid) {
             await Fsp.chown(dir, this.config.uid, this.config.gid)
         }
     }
 
-    async move() {
-
+    async move(newPath) {
+        var srcPath = this.config.fullPath
+        var destPath = this.config.base+newPath
+        console.log("MirroredLocal move:",srcPath,destPath)
+        await Fsp.rename(srcPath, destPath)
     }
 
     async copy() {
 
     }
 
-    async delete() {
+    async remove() {
+        try {
+            console.log("MirroredLocal: remove", this.config.fullPath)
+            await Fsp.unlink(this.config.fullPath)
+        } catch(e) {
+            console.error("MirroredLocal: remove()", e)
+        }
 
     }
 

@@ -15,6 +15,10 @@ var FSDirectory = FSNode.extend(iCollection,
     async "delete"() {
         //var children=await this.getChildren()
         this.writeAllowed()
+        var cs = await this.getChildren()
+        await Promise.all(cs.map( async (child) => {
+            return await child['delete']()
+        }))
         await this.storagePath.remove();
     },
 

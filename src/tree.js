@@ -62,31 +62,33 @@ var inodesTree = jsDAV_Tree.extend ({
 
 
     async move(moveInfo) {
-        console.log("MOVE",moveInfo.source,moveInfo.destination)
-        await this.recursiveMove(moveInfo.sourceNode,
-                        moveInfo.destinationParentNode,
-                        moveInfo.destinationName
-                                )
+        console.log("MOVE",moveInfo.source,moveInfo.destination,
+                    moveInfo.destinationExists, moveInfo.overwrite)
         var backendSrc=await moveInfo.sourceNode.storagePath.backend()
         var backendDestParent=await moveInfo.destinationParentNode.storagePath.backend()
         if (backendSrc.id != backendDestParent.id)
             throw( new Exc.NotImplemented('Cross backend move not implemented'))
 
+        await this.recursiveMove(moveInfo.sourceNode,
+                        moveInfo.destinationParentNode,
+                        moveInfo.destinationName
+                                )
+
 
 
     },
 
-    async recursiveMove(node,destParentNode, name) {
+    async recursiveMove(node, destParentNode, name) {
         if (node.getSize) { //file
             console.log("move file", node.path(), destParentNode.path(), name)
             var dest = await node.moveToParent(destParentNode, name)
         } else {
             console.log("move  dir", node.path(), destParentNode.path(), name)
             var dest = await node.moveToParent(destParentNode, name)
-            children=await node.getChildren()
-            children.forEach( async (node)=>{
-                await this.recursiveMove(node,dest,node.getName())
-            })
+            //children=await node.getChildren()
+            //children.forEach( async (node)=>{
+            //    await this.recursiveMove(node,dest,node.getName())
+            //})
         }
     },
 
