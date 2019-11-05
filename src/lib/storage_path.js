@@ -137,7 +137,7 @@ class StoragePath {
 
         var srcBackend= await this.backend()
         var destBackend= await newParent.backend()
-        await srcBackend.move(destBackend.config.downPath+newName)
+        await srcBackend.move(destBackend.config.downPath+'/'+newName)
 //        console.log("StoragePath: move ", newParent, newName,
 //                    parentEntry.id, thisEntry.id);
         await thisEntry.update({

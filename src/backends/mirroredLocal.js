@@ -169,11 +169,19 @@ class MirroredLocal {
     }
 
     async mkdir(name, resourceType, properties) {
-        var dir = this.config.base + this.config.downPath+'/'+name;
-        console.log("MirroredLocal",dir,  resourceType, properties)
+        var dir = this.config.base + this.config.downPath
+        if (this.config.downPath!='') {
+            dir = dir + '/'
+        }
+        dir = dir + name;
+        console.log("MirroredLocal mkdir:",
+                    this.config.base,
+                    this.config.downPath,
+                    name,
+                    dir)
         Fsp.mkdir(dir, { recursive: true })
         if (this.config.uid && this.config.gid) {
-            await Fsp.chown(dir, this.config.uid, this.config.gid)
+//            await Fsp.chown(dir, this.config.uid, this.config.gid)
         }
     }
 
@@ -193,7 +201,11 @@ class MirroredLocal {
             console.log("MirroredLocal: remove", this.config.fullPath)
             await Fsp.unlink(this.config.fullPath)
         } catch(e) {
-            console.error("MirroredLocal: remove()", e)
+            try {
+                await Fsp.rmdir(this.config.fullPath)
+            } catch(e) {
+//                console.error("MirroredLocal: remove()", e)
+            }
         }
 
     }
