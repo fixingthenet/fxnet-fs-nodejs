@@ -179,9 +179,9 @@ class MirroredLocal {
                     this.config.downPath,
                     name,
                     dir)
-        Fsp.mkdir(dir, { recursive: true })
+        await Fsp.mkdir(dir, { recursive: true })
         if (this.config.uid && this.config.gid) {
-//            await Fsp.chown(dir, this.config.uid, this.config.gid)
+            await Fsp.chown(dir, this.config.uid, this.config.gid)
         }
     }
 
