@@ -15,10 +15,10 @@ class StoragePath {
         this.path=path
         this.tree=tree
         this.inodes=inodes //optional for speedup
-
     }
 
     async initialize(force) {
+//        console.log("StoragePath",this.path)
         if (this.path=='' || !this.path) {
             this.path=''
             this.path_parts=['/']
@@ -34,6 +34,7 @@ class StoragePath {
             this.inodes=await models.Inode.resolvePath('/'+this.path);
 
         this.isExisting=(this.inodes.length == this.path_parts.length)
+//        console.log('initialize:',this.inodes.length,this.path_parts.length)
         if (this.isExisting) {
             this.inode=this.inodes[this.inodes.length-1]
             this.entry=this.inode
@@ -96,18 +97,22 @@ class StoragePath {
 
     async createChild(name,isFolder) {
         this._throwNonExisting("can't create children")
-            var child=await models.Inode.create(
-                {name: name,
-                 parent_id: this.inode.id,
-                 is_folder: isFolder,
-                 created_at: new Date(),
-                 modified_at: new Date(),
-                 updated_at: new Date(),
-                 readers: this.inode.readers,
-                 writers: this.inode.writers,
-                 admins: this.inode.admins
-                })
-            return await this._wrapInode(child)
+        var child=await models.Inode.create(
+            {name: name,
+             parent_id: this.inode.id,
+             is_folder: isFolder,
+             created_at: new Date(),
+             modified_at: new Date(),
+             updated_at: new Date(),
+             readers: this.inode.readers,
+             writers: this.inode.writers,
+             admins: this.inode.admins
+            })
+        if (isFolder) {
+            var backend= await this.backend()
+            await backend.mkdir(name)
+        }
+        return await this._wrapInode(child)
     }
 
     async remove() {

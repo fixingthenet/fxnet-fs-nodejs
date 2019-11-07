@@ -6,6 +6,7 @@ var FSFile = FSNode.extend(iFile, {
     //get
 
     async "delete"() {
+        if (!this.isExisting()) return false
         this.writeAllowed()
         await this.storagePath.remove();
     },

@@ -192,8 +192,11 @@ class MirroredLocal {
         await Fsp.rename(srcPath, destPath)
     }
 
-    async copy() {
-
+    async copy(newPath) {
+        var srcPath = this.config.fullPath
+        var destPath = this.config.base+newPath
+        console.log("MirroredLocal move:",srcPath,destPath)
+        await Fsp.copyFile(srcPath, destPath)
     }
 
     async remove() {

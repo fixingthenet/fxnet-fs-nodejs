@@ -13,7 +13,7 @@ var FSDirectory = FSNode.extend(iCollection,
                                 {
 
     async "delete"() {
-        //var children=await this.getChildren()
+        if (!this.isExisting()) return false
         this.writeAllowed()
         var cs = await this.getChildren()
         await Promise.all(cs.map( async (child) => {
@@ -60,7 +60,7 @@ var FSDirectory = FSNode.extend(iCollection,
            throw( new Exc.Forbidden('The backend can not handle files.'))
 
        var childStoragePath = await this.storagePath.createChild(name, false);
-         var child = FSDirectory.wrap(childStoragePath, this.tree);
+       var child = FSDirectory.wrap(childStoragePath, this.tree);
        return child
      },
 

@@ -19,6 +19,8 @@ var inodesTree = jsDAV_Tree.extend ({
 
     },
 
+
+
     async getNodeForPath(path) {
         var sp=new StoragePath(path,this);
         await sp.initialize()
@@ -28,6 +30,7 @@ var inodesTree = jsDAV_Tree.extend ({
             throw(new Exc.FileNotFound(`File at location ${path} not found`))
         }
     },
+
 
     readFile(node, start, end) {
         return node.getStream(start, end)
@@ -50,10 +53,6 @@ var inodesTree = jsDAV_Tree.extend ({
 
 
     async mkDir(parent, name, resourceType, properties ) {
-        var backend=await parent.storagePath.backend()
-        if (backend.mkdir) {
-            await backend.mkdir(name,resourceType, properties)
-        }
         return await parent.createDirectory(name,
                                             resourceType,
                                             properties
@@ -68,6 +67,10 @@ var inodesTree = jsDAV_Tree.extend ({
         var backendDestParent=await moveInfo.destinationParentNode.storagePath.backend()
         if (backendSrc.id != backendDestParent.id)
             throw( new Exc.NotImplemented('Cross backend move not implemented'))
+//        if (moveInfo.overwrite && moveInfo.destinationExists) {
+//            console.log("overwriting existing", moveInfo.destinationNode.isExisting(), moveInfo.destinationNode)
+//            await this["delete"](moveInfo.destinationNode)
+//        }
 
         await this.recursiveMove(moveInfo.sourceNode,
                         moveInfo.destinationParentNode,
@@ -101,7 +104,7 @@ var inodesTree = jsDAV_Tree.extend ({
     },
 
     async recursiveCopy(node,destParentNode, name) {
-        if (node.getSize) { //file
+        if (node.getSize) {
             console.log("copy file", node.path(), destParentNode.path(), name)
             var dest = await destParentNode.createFile(name)
         } else {

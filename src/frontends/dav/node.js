@@ -13,6 +13,10 @@ var FSNode = iNode.extend({
         return this.storagePath.path
     },
 
+    isExisting() {
+      return this.storagePath.isExisting
+    },
+
     getName() {
         return this.storagePath.name
     },
