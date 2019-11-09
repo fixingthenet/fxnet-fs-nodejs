@@ -18,6 +18,9 @@ module.exports = (sequelize, DataTypes) => {
         storage_key: {
             type: DataTypes.STRING
         },
+        props: {
+            type: DataTypes.JSONB
+        },
         sha512: {
             type: DataTypes.STRING
         },

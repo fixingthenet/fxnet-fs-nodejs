@@ -115,14 +115,14 @@ class BinaryStoreWriteStream extends stream.Writable {
         // and update the file
         this.file.sha512 = this.etag;
         // TBD update more
-        console.log("binary:",
+/*        console.log("binary:",
                     this.etag,
                     this.bytes_written,
                     this.contentType,
                     this.contentTypeMajor,
                     this.contentTypeMinor,
                     this.charset
-                   );
+                   );*/
     }
 
     _contentType() {

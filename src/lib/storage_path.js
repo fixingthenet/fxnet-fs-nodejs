@@ -67,12 +67,18 @@ class StoragePath {
     }
 
     isFolder() {
-        // we treat nonexistinent things as folders
         this._throwNonExisting("Inode doesn't know if it's a folder")
-        //if (this.isExisting)
-            return this.inode.is_folder
-        //else
-        //    return true
+        return this.inode.is_folder
+    }
+
+    async getProperties() {
+        this._throwNonExisting("getProperties of nonexistent")
+        return this.inode.props
+    }
+
+    async updateProperties(props) {
+        this._throwNonExisting("updateProperties on nonexistent")
+        return await this.inode.update({props: props})
     }
 
     async children() {

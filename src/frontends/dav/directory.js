@@ -28,6 +28,7 @@ var FSDirectory = FSNode.extend(iCollection,
         return FSDirectory.wrap(child, this.tree)
     },*/
 
+
     async getChildren() {
         this.readAllowed()
         var children = await this.storagePath.children()

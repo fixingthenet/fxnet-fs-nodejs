@@ -117,6 +117,17 @@ var inodesTree = jsDAV_Tree.extend ({
         }
     },
 
+    async updateProperties(node, props) {
+//        console.log("tree updateProperties", node.path(), props)
+        await node.updateProperties(props)
+        return true
+    },
+
+    async getProperties(node,props) {
+//        console.log("tree getProperties", node.path(), props)
+        return await node.getProperties(props)
+    },
+
     userContext() {
         if (this.userCtx)
             return this.userCtx
