@@ -174,11 +174,11 @@ class MirroredLocal {
             dir = dir + '/'
         }
         dir = dir + name;
-        console.log("MirroredLocal mkdir:",
+/*        console.log("MirroredLocal mkdir:",
                     this.config.base,
                     this.config.downPath,
                     name,
-                    dir)
+                    dir)*/
         await Fsp.mkdir(dir, { recursive: true })
         if (this.config.uid && this.config.gid) {
             await Fsp.chown(dir, this.config.uid, this.config.gid)
@@ -188,20 +188,20 @@ class MirroredLocal {
     async move(newPath) {
         var srcPath = this.config.fullPath
         var destPath = this.config.base+newPath
-        console.log("MirroredLocal move:",srcPath,destPath)
+//        console.log("MirroredLocal move:",srcPath,destPath)
         await Fsp.rename(srcPath, destPath)
     }
 
     async copy(newPath) {
         var srcPath = this.config.fullPath
         var destPath = this.config.base+newPath
-        console.log("MirroredLocal move:",srcPath,destPath)
+//        console.log("MirroredLocal copy:",srcPath,destPath)
         await Fsp.copyFile(srcPath, destPath)
     }
 
     async remove() {
         try {
-            console.log("MirroredLocal: remove", this.config.fullPath)
+//            console.log("MirroredLocal: remove", this.config.fullPath)
             await Fsp.unlink(this.config.fullPath)
         } catch(e) {
             try {

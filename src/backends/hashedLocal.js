@@ -194,6 +194,19 @@ class HashedLocal {
         await stream.init()
         return stream;
     }
+    async mkdir(_name) {
+
+    }
+    async move(_name) {
+
+    }
+    async copy(name) {
+        throw "Not implemented"
+    }
+    async remove(_name) {
+
+    }
+
 }
 
 HashedLocal.name='HashedLocal'

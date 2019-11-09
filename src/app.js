@@ -51,7 +51,7 @@ async function start(listen) {
             //node: __dirname + "/../public",
             tree: tree,
             server: httpServer,
-            locksBackend: jsDAV_Locks_Backend_FS.new(__dirname + "/../locks"),
+//            locksBackend: jsDAV_Locks_Backend_FS.new(__dirname + "/../locks"),
             authBackend: authBackend.new(),
             realm: "test",
             mount: '/',
