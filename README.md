@@ -19,17 +19,30 @@ Implemented
 
 Planed
  * TOS
-## Currently supported backends
+ * native REST
+ * nfs
+ * ftp https://github.com/alanszlosek/nodeftpd
+ * smb https://github.com/adobe/node-smb-server
+ * TUS https://tus.io/
+ * native graphql
+ * s3 v3/4
+ * hadoopfs
+
+## Backends
 ### MirroredLocal
 Stores files on the local filesystem. Runs filesystem native commands.
 This is currently a one way street (already exisintg files are ignored).
 ### HashedLocal
 Doesn't care about directories but just cars about data. So files are stored
-in files like "01f/78b/e6f/7cad02658508fe4616098a9-550". 
+in files like "01f/78b/e6f/7cad02658508fe4616098a9-550".
 
 Pros
  * moves are only done in the meta filesystem
 
+### Planed
+ * dropbox
+ * s3
+ * gdrive
 
 ## Setup
 
@@ -40,11 +53,11 @@ You need to
  * configure fxnet-fs (see below)
  * run the migrations: ```sequelize db:migrate```
  * run the seeds:  ```sequelize db:seed:all```
- 
+
 
 ## Configuration
 
-Environment variables 
+Environment variables
 ```
 AUTH_API_URL 		url to your fxnet-auth backend (e.g. http://dev-auth-api.fixingthe.net/)
 DB_DATABASE 		name of the database e.g. "fs"
