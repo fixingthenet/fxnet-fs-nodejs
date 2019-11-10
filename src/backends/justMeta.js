@@ -2,15 +2,24 @@ var Exc = require("jsDAV/lib/shared/exceptions");
 
 class JustMeta {
     constructor(config) {
+        this.config=config
     }
 
-//    async readStream(file, start, end) {
-//        throw( new Exc.Forbidden('The JustMeta can not handle files.'))
-//    }
+    async mkdir(_name) {
 
-//    async writeStream(file) {
-//        throw( new Exc.Forbidden('The JustMeta can not handle files.'))
-//    }
+    }
+
+    async move(_name) {
+
+    }
+
+    async copy(name) {
+
+    }
+
+    async remove(_name) {
+
+    }
 
 }
 

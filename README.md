@@ -1,24 +1,46 @@
 # Fxnet FS (nodejs)
+## About
+A multi api and multi backend meta filesystem. Mutli api means this server
+provides differend apis so existing applications/clients can connect to it
+without modifications.
 
-A multi api and multi backend meta filesystem.
-Currently supported frontend apis:
+Multibackend means it can store data in different formats on different
+backends (like s3, dropbox, ....)
+
+So the goal is to see a consistant filesystem over a lot of storages.
+
+Another problem to solve was scaling. Most web filesystem implmentations
+don't scale for enterprise usage, this should (not google like but enough
+for some terrabites and esp. for huge files)
+
+### frontend apis
+Implemented
  * webdav
 
-Currently supported backends:
- * local fs
- * local hashed fs
+Planed
+ * TOS
+## Currently supported backends
+### MirroredLocal
+Stores files on the local filesystem. Runs filesystem native commands.
+This is currently a one way street (already exisintg files are ignored).
+### HashedLocal
+Doesn't care about directories but just cars about data. So files are stored
+in files like "01f/78b/e6f/7cad02658508fe4616098a9-550". 
 
-## About
-
-## Architecture
+Pros
+ * moves are only done in the meta filesystem
 
 
 ## Setup
 
-You need 
- * fxnet-auth
- * postgresql
-
+You need to
+ * install fxnet-auth
+ * setup postgresql
+ * I recommend a docker setup but that optional
+ * configure fxnet-fs (see below)
+ * run the migrations: ```sequelize db:migrate```
+ * run the seeds:  ```sequelize db:seed:all```
+ 
 
 ## Configuration
 
@@ -30,6 +52,9 @@ DB_HOST 		host of the database e.g. "postgres96.dev-central"
 DB_PASSWORD 		password of the db
 DB_USERNAME 		username of the db
 ```
+
+Currently there's no api to mount filesystems so you can only create folders
+(the  JustMeta backend is mounted on root)
 
 ## Operation
 ### Exmaples with curl
