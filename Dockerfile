@@ -11,7 +11,7 @@ RUN yarn global add nodemon
 RUN yarn global add babel-cli
 
 ADD package.json package.json
-#ADD yarn.lock yarn.lock
+ADD yarn.lock yarn.lock
 
 RUN yarn install
 

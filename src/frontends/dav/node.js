@@ -3,6 +3,8 @@ const iProps = require("jsDAV/lib/DAV/interfaces/iProperties");
 const StoragePath = require("../../lib/storage_path")
 var Exc = require("jsDAV/lib/shared/exceptions");
 
+
+
 var FSNode = iNode.extend(
     iProps,
     {
@@ -33,9 +35,10 @@ var FSNode = iNode.extend(
                                         newName)
         },
 
-        async copyToParent(newParentNode, newName) {
-            await this.storagePath.copy(newParent.storagePath,
-                                        newName)
+        async copyToParent(destParentNode,name) {
+            //we should wrap it here
+            return await this.storagePath.copy(destParentNode.storagePath,
+                                               name)
         },
 
         async updateProperties(props) {

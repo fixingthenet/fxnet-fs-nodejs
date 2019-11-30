@@ -45,7 +45,7 @@ var FSFile = FSNode.extend(iFile, {
 //            console.log("upload done (close)")
         })
         return stream;
-    }
+    },
 })
 
 

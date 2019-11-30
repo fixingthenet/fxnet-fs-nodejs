@@ -67,10 +67,6 @@ var inodesTree = jsDAV_Tree.extend ({
         var backendDestParent=await moveInfo.destinationParentNode.storagePath.backend()
         if (backendSrc.id != backendDestParent.id)
             throw( new Exc.NotImplemented('Cross backend move not implemented'))
-//        if (moveInfo.overwrite && moveInfo.destinationExists) {
-//            console.log("overwriting existing", moveInfo.destinationNode.isExisting(), moveInfo.destinationNode)
-//            await this["delete"](moveInfo.destinationNode)
-//        }
 
         await this.recursiveMove(moveInfo.sourceNode,
                         moveInfo.destinationParentNode,
@@ -97,6 +93,11 @@ var inodesTree = jsDAV_Tree.extend ({
 
     async copy(copyInfo) {
         console.log("COPY",copyInfo.source,copyInfo.destination)
+        var backendSrc=await copyInfo.sourceNode.storagePath.backend()
+        var backendDestParent=await copyInfo.destinationParentNode.storagePath.backend()
+        if (backendSrc.id != backendDestParent.id)
+            throw( new Exc.NotImplemented('Cross backend move not implemented'))
+
         await this.recursiveCopy(copyInfo.sourceNode,
                         copyInfo.destinationParentNode,
                         copyInfo.destinationName
@@ -106,10 +107,11 @@ var inodesTree = jsDAV_Tree.extend ({
     async recursiveCopy(node,destParentNode, name) {
         if (node.getSize) {
             console.log("copy file", node.path(), destParentNode.path(), name)
-            var dest = await destParentNode.createFile(name)
+            await node.copyToParent(destParentNode,name)
         } else {
             console.log("copy  dir", node.path(), destParentNode.path(), name)
-            var dest = await destParentNode.createDirectory(name)
+            var dest = await node.copyToParent(destParentNode,name)
+            dest = FSDirectory.wrap(dest, this)
             children=await node.getChildren()
             children.forEach( async (node)=>{
                 await this.recursiveCopy(node,dest,node.getName())

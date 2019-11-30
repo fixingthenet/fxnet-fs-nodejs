@@ -65,6 +65,7 @@ var FSDirectory = FSNode.extend(iCollection,
        return child
      },
 
+
 })
 
 // wrap is only used by directory AND tree!

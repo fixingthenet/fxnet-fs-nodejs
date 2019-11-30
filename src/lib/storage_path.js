@@ -161,13 +161,18 @@ class StoragePath {
     }
 
 
-    async copy(newParent, newName) {
+    async copy(destParent, name) {
         this._throwNonExisting("can't be moved")
         // move each of them separately
-        var parentInode= newParent.inode;
-//        console.log("StoragePath: copy ", newName)
-        await this.inode.copy(parentInode, newName)
-        // TBD copy the backend
+        var parentInode= destParent.inode;
+        var srcBackend= await this.backend()
+        var destBackend= await destParent.backend()
+        if (this.isFolder()) {
+            return await destParent.createChild(name,true)
+        } else {
+            await srcBackend.copy(destBackend.config.downPath+'/'+name)
+            return await destParent.createChild(name,false)
+        }
     }
 
     async updateMetaContent(atts) {
