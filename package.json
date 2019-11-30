@@ -4,6 +4,10 @@
   "description": "Multiprotocol vritual FS",
   "author": "Peter Schrammel",
   "private": true,
+  "scripts" : {
+    "start": "node src/main.js",
+    "dev": "nodemon src/main.js"
+  },
   "dependencies": {
     "apollo-server-express": "^2.1.0",
     "async": "^2.6.2",

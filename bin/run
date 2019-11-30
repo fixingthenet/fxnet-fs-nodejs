@@ -1,7 +1,14 @@
 #!/bin/bash
 export PATH=$PATH:/code/node_modules/.bin
-if [ ! -d /code/node_modules ]; then
-  yarn install
-fi
-exec nodemon src/main.js 
-#--exec babel-node --presets es2015,stage-2
+
+mode=${1:-prod}
+
+if [ $mode == "dev" ]; then
+  if [ ! -d /code/node_modules ]; then
+    yarn install
+  fi
+  exec yarn run dev
+else
+  exec yarn run start
+fi  
+
