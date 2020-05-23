@@ -1,10 +1,10 @@
 {
-  "project": "fxnet-fs-nodejs",
+  "project": "fxnet-fs",
     
-  "git": "github.com/fixingthenet/fxnet-fs-nodejs",
-  "path": "fxnet-fs-nodejs",
+  "git": "github.com/fixingthenet/fxnet-fs",
+  "path": "fxnet-fs",
   "docker": {
     "repo": "fxnet",
-    "name": "fxnet-fs-nodejs"
+    "name": "fxnet-fs"
   }
 }

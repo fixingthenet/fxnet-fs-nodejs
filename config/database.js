@@ -14,7 +14,9 @@ module.exports ={
          "acquire": 30000,
          "idle": 10000
     },
-    'migrationStorageTableName': 'sequelize_meta'
+    'migrationStorageTableName': 'sequelize_meta',
+    "seederStorage": "sequelize",
+    "seederStorageTableName": "sequelize_data"
   },
   "test": {
     "username": process.env.DB_USERNAME,
@@ -23,8 +25,6 @@ module.exports ={
     "host": process.env.DB_HOST,
     "dialect": "postgres",
     'migrationStorageTableName': 'sequelize_meta'
-
-
   },
   "production": {
     "username": process.env.DB_USERNAME,
@@ -32,7 +32,8 @@ module.exports ={
     "database": process.env.DB_DATABASE,
     "host": process.env.DB_HOST,
     "dialect": "postgres",
-    'migrationStorageTableName': 'sequelize_meta'
-
+    'migrationStorageTableName': 'sequelize_meta',
+    "seederStorage": "sequelize",
+    "seederStorageTableName": "sequelize_data"
   }
 }

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# this might fail (we don't care)
+/code/node_modules/.bin/sequelize-cli db:create
+
+/code/node_modules/.bin/sequelize-cli db:migrate
+
+/code/node_modules/.bin/sequelize-cli db:seed:all
