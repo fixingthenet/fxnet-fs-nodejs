@@ -7,7 +7,7 @@ module.exports ={
     "database": process.env.DB_DATABASE,
     "host": process.env.DB_HOST,
     "dialect": "postgres",
-    "logging": false,
+    "logging": true,
     "pool": {
          "max": 5,
          "min": 0,
@@ -31,6 +31,7 @@ module.exports ={
     "password": process.env.DB_PASSWORD,
     "database": process.env.DB_DATABASE,
     "host": process.env.DB_HOST,
+    "logging": false,
     "dialect": "postgres",
     'migrationStorageTableName': 'sequelize_meta',
     "seederStorage": "sequelize",

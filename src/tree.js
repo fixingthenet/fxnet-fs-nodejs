@@ -141,7 +141,7 @@ var inodesTree = jsDAV_Tree.extend ({
             this.userCtx = {user: jwtc.user}
         } catch(e) {
             this.userCtx = { user: {id: 0, login: "guest"}}
-            console.error("Getting authentificiation failed:",e)
+            console.error("Getting authentificiation failed, fallback to guest:",e)
         }
 
         return this.userCtx

@@ -6,12 +6,14 @@ const jsDAVBasicAuth = require('jsDAV/lib/DAV/plugins/auth/abstractBasic');
 
 var authBackend = jsDAVBasicAuth.extend({
     validateUserPass: async function(login, password){
-
-        var result =  await authAPI.login({
-            login: login,
-            password: password
-        })
-
+        try {
+          var result =  await authAPI.login({
+              login: login,
+              password: password
+          })
+        } catch(e) {
+          result = { token: 'guest' }
+        }
         if (result.sessionLogin &&
             result.sessionLogin.errors) {
             //console.log("not authenticated: ",login,

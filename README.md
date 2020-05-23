@@ -33,7 +33,7 @@ Planed
 Stores files on the local filesystem. Runs filesystem native commands.
 This is currently a one way street (already exisintg files are ignored).
 ### HashedLocal
-Doesn't care about directories but just cars about data. So files are stored
+Doesn't care about directories but just cares about data. So files are stored
 in files like "01f/78b/e6f/7cad02658508fe4616098a9-550".
 
 Pros
@@ -68,6 +68,8 @@ DB_USERNAME 		username of the db
 
 Currently there's no api to mount filesystems so you can only create folders
 (the  JustMeta backend is mounted on root)
+
+For setup run bin/setup. Will create a public folder.
 
 ## Operation
 ### Exmaples with curl

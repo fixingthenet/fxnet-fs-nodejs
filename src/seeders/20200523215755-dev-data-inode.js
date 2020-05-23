@@ -4,7 +4,8 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
      return queryInterface.bulkInsert('inodes',
                                        [{
-                                           name: '/data',
+                                           name: 'data',
+                                           parent_id: 1, // hot to not hardcode this?
                                            is_folder: true,
                                            created_at: new Date(),
                                            updated_at: new Date(),
