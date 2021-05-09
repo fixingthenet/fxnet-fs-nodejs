@@ -1,4 +1,5 @@
 //middleware
+
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
@@ -20,24 +21,28 @@ Backends.register(require('./backends/hashedLocal'));
 Backends.register(require('./backends/justMeta'));
 Backends.register(require('./backends/mirroredLocal'));
 
+const uiTarget = process.env.UI_URL+'ui/'
+
 async function start(listen) {
     // Make sure the database tables are up to date
     //    await models.sequelize.authenticate();
     var options = {
         port: 3000,
     }
-    // Start the GraphQL server
-    app.use(logger('dev'));
-//    app.use(bodyParser.json());
-//    app.use(cors());
-//    server.applyMiddleware({ app });
-//    await models.User.setup();
-//    app.get('/api/', function (req, res) {
-//        res.send('GET request to homepage');
-//    });
 
-    app.get('/api/health.json', (req,res) => {
+    app.use(logger('dev'));
+
+    // when adding something here don't forget to escape from the jdav servers below
+
+    app.get('/ep/health.json', (req,res) => {
         res.send(JSON.stringify({ "success": true}))
+    })
+
+    app.get('/', (req, res) => {
+        console.log("Special redirect to ui" ,uiTarget)
+        res.statusCode=301
+        res.setHeader('Location', uiTarget)
+        res.send()
     })
 
     if (listen) {
@@ -62,17 +67,21 @@ async function start(listen) {
             ],
         })
 
+        // we hook in the jDav server first and then the current listeners
         var listeners = httpServer.listeners("request");
+//        console.log("listeners:",listeners);
         httpServer.removeAllListeners("request");
         httpServer.addListener("request", function(req, resp) {
             req.pause()
             var path = Url.parse(req.url).pathname;
-//            console.log("Path", path, httpServer.listeners.length);
+            console.log("Path", path, httpServer.listeners.length);
             if (path.charAt(path.length - 1) != "/")
                 path = path + "/";
-            if (path.match(/^\/api\/|^\/graphql\//)) { // add non jsdav paths here
+            if (path.match(/^\/api\/|^\/ep\/|^\/$/)) { // add non jsdav paths here
+                console.log(`Special route: '${path}'`)
                 for (var i = 0, len = listeners.length; i < len; ++i)
                     listeners[i].call(httpServer, req, resp);
+                console.log("Response:",resp.statusCode)
             } else {
                 jsdavServer.exec(req, resp);
             }

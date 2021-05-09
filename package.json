@@ -9,17 +9,12 @@
     "dev": "nodemon src/main.js"
   },
   "dependencies": {
-    "apollo-server-express": "^2.1.0",
     "async": "^2.6.2",
     "bcrypt": "^3.0.2",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "dataloader-sequelize": "^1.7.4",
     "express": "^4.16.4",
-    "graphql": "^0.13.1",
-    "graphql-relay": "^0.5.5",
-    "graphql-sequelize": "^9.0.4",
-    "graphql.js": "^0.6.1",
     "jsDAV": "https://github.com/pschrammel/jsDAV.git#async2",
     "jsonwebtoken": "^8.4.0",
     "mmmagic": "^0.5.2",

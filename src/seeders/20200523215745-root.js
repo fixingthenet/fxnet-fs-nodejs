@@ -10,6 +10,9 @@ module.exports = {
                                            updated_at: new Date(),
                                            modified_at: new Date(),
                                            backend_id: 1, //how to not hardcode this?
+                                           readers: [1],
+                                           writers: [1],
+                                           admins: [1],
                                        }], {});
 
   },

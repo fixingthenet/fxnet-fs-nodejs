@@ -1,14 +1,8 @@
 #!/bin/bash
-export PATH=$PATH:/code/node_modules/.bin
-
-mode=${1:-prod}
+mode=${APP_ENV}
 
 if [ $mode == "dev" ]; then
-  if [ ! -d /code/node_modules ]; then
-    yarn install
-  fi
   exec yarn run dev
 else
   exec yarn run start
-fi  
-
+fi
