@@ -10,6 +10,9 @@ const app = express();
 const models = require('./models');
 var jsdav = require('jsDAV/lib/jsdav');
 const Url = require('url');
+const JSONAPISerializer = require('jsonapi-serializer').Serializer;
+const JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
+
 const jsDAV_Locks_Backend_FS = require("jsDAV/lib/DAV/plugins/locks/fs");
 const authPlugin = require('jsDAV/lib/DAV/plugins/auth');
 const authBackend = require('./auth');
@@ -34,7 +37,31 @@ async function start(listen) {
 
     // when adding something here don't forget to escape from the jdav servers below
 
+    app.options('/ui', (req, res) => {
+        console.log("Special ui options")
+        res.end()
+    })
+
+
+    app.get('/api/v1/app_configurations/:id', (req, res) => {
+        console.log("Special app confgiurations")
+        var AppConfigurationSerializer = new JSONAPISerializer('app_configurations', {
+            attributes: ['configuration']
+        });
+        var data={ configuration: {
+            "oidc_issuer":"https://auth.dev.fixingthe.net",
+            "oidc_client_id": "bc7bfb5df84e259d969ae7f8fbc7b7fe",
+            "oidc_scopes": 'openid'
+        }
+
+                                  }
+        var serialized = AppConfigurationSerializer.serialize(data);
+        res.send(JSON.stringify(serialized))
+    })
+
+
     app.get('/ep/health.json', (req,res) => {
+        console.log("Special health")
         res.send(JSON.stringify({ "success": true}))
     })
 

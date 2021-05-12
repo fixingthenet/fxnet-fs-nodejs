@@ -16,6 +16,7 @@
     "dataloader-sequelize": "^1.7.4",
     "express": "^4.16.4",
     "jsDAV": "https://github.com/pschrammel/jsDAV.git#async2",
+    "jsonapi-serializer": "^3.6.7",
     "jsonwebtoken": "^8.4.0",
     "mmmagic": "^0.5.2",
     "morgan": "^1.9.1",
