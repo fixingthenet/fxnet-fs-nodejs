@@ -104,7 +104,13 @@ async function start(listen) {
             console.log("Path", path, httpServer.listeners.length);
             if (path.charAt(path.length - 1) != "/")
                 path = path + "/";
-            if (path.match(/^\/api\/|^\/ep\/|^\/$/)) { // add non jsdav paths here
+            if (path == '/' && req.method == 'GET') {
+                console.log(`Special route: '${path}'`)
+                for (var i = 0, len = listeners.length; i < len; ++i)
+                    listeners[i].call(httpServer, req, resp);
+                console.log("Response:",resp.statusCode)
+            }
+            if (path.match(/^\/api\/|^\/ep\//)) { // add non jsdav paths here
                 console.log(`Special route: '${path}'`)
                 for (var i = 0, len = listeners.length; i < len; ++i)
                     listeners[i].call(httpServer, req, resp);
