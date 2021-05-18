@@ -86,7 +86,4 @@ end
 To develop jsDAV: 
 
  * Mount jsDAV into /jsDAV (if you use docker)
- * cd /jsDAV
- * yarn link
- * cd /code
- * yarn link jsDAV
+ * uncomment jsDAV in bin/run

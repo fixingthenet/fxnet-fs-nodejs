@@ -135,7 +135,7 @@ var inodesTree = jsDAV_Tree.extend ({
             return this.userCtx
 
         this.userCtx = this.handler.plugins.auth.authBackend.getCurrentUser()
-        console.log("userContext:", this.userCtx)
+//        console.log("userContext:", this.userCtx)
         return this.userCtx
     },
 

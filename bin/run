@@ -1,6 +1,10 @@
 #!/bin/bash
 mode=${APP_ENV}
 
+#only for jsDAV development
+#rm -rf node_modules/jsDAV
+#ln -s /jsDAV /code/node_modules/jsDAV
+
 if [ $mode == "dev" ]; then
   exec yarn run dev
 else

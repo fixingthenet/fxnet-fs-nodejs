@@ -109,8 +109,7 @@ async function start(listen) {
                 for (var i = 0, len = listeners.length; i < len; ++i)
                     listeners[i].call(httpServer, req, resp);
                 console.log("Response:",resp.statusCode)
-            }
-            if (path.match(/^\/api\/|^\/ep\//)) { // add non jsdav paths here
+            } else if (path.match(/^\/api\/|^\/ep\//)) { // add non jsdav paths here
                 console.log(`Special route: '${path}'`)
                 for (var i = 0, len = listeners.length; i < len; ++i)
                     listeners[i].call(httpServer, req, resp);
