@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "async": "^2.6.2",
-    "bcrypt": "^3.0.2",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "dataloader-sequelize": "^1.7.4",
