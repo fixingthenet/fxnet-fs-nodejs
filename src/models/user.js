@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
         sub: {
             type: DataTypes.STRING
         },
+        identifier: {
+            type: DataTypes.STRING
+        },
         created_at: {
             type: DataTypes.DATE
         },

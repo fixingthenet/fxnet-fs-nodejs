@@ -134,16 +134,8 @@ var inodesTree = jsDAV_Tree.extend ({
         if (this.userCtx)
             return this.userCtx
 
-        try {
-            var token=this.handler.plugins.auth.authBackend.getCurrentUser().sessionLogin.token
-            var jwtc = jwt.verify(token, publicKey)
-//            console.log("auth", token,jwtc)
-            this.userCtx = {user: jwtc.user}
-        } catch(e) {
-            this.userCtx = { user: {id: 0, login: "guest"}}
-            console.error("Getting authentificiation failed, fallback to guest:",e)
-        }
-
+        this.userCtx = this.handler.plugins.auth.authBackend.getCurrentUser()
+        console.log("userContext:", this.userCtx)
         return this.userCtx
     },
 

@@ -82,3 +82,11 @@ curl -i -X PROPFIND http:///dev-fs.fixingthe.net/ --upload-file - -H "Depth: 1" 
 end
 ```
 ## Development
+
+To develop jsDAV: 
+
+ * Mount jsDAV into /jsDAV (if you use docker)
+ * cd /jsDAV
+ * yarn link
+ * cd /code
+ * yarn link jsDAV
