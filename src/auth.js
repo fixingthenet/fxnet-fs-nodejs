@@ -5,6 +5,7 @@ const jwktopem=require('jwk-to-pem')
 const models = require('./models');
 
 const { Issuer } = require('openid-client');
+
 //const jose = require('node-jose');
 
 // username and password via basic auth
@@ -21,17 +22,22 @@ var IssuerCache= {}
 
 var authBackend = jsDAVBasicAuth.extend({
     validateUserPass: async function(login, password, rawHeader){
-//        console.log("validateUserPass:", login, password, rawHeader.substr(7), rawHeader.toLowerCase().indexOf("bearer") ,rawHeader)
-
-        if (login == 'fxnet-idtoken') {
-            return (await this.checkIdToken(password))
-        } else if (rawHeader.toLowerCase().indexOf("bearer") == 0) {
-            var jwt = rawHeader.substr(7)
-            return (await this.checkIdToken(jwt))
+        try {
+            if (login == 'fxnet-idtoken') {
+                console.debug("Basic fxnet-idtoken", password)
+                return (await this.checkIdToken(password))
+            } else if (rawHeader.toLowerCase().indexOf("bearer") == 0) {
+                var jwt = rawHeader.substr(7)
+                return (await this.checkIdToken(jwt))
+            } else {
+                //console.log("validateUserpass: fallback guest")
+            return  {user: await models.User.findOne({where: {identifier: 'guest'}})}
+            }
+        } catch(e) {
+            console.log("Auth error", e)
+            this.requireAuth('fxnet-fs')
+            //throw(new AuthenticationError())
         }
-
-//        console.log("validateUserpass: fallback guest")
-        return  {user: await models.User.findOne({where: {identifier: 'guest'}})}
     },
 
     async checkIdToken(jwtString) {
@@ -43,6 +49,7 @@ var authBackend = jsDAVBasicAuth.extend({
 
         var keystore = await issuer.keystore()
         var decoded = jws.decode(jwtString)
+        console.debug("decoded:", decoded)
         var payload = jwt.verify(jwtString,jwktopem(keystore.get(decoded.header.kid)),
                                  {
                                      algorithms: ['RS256'],
