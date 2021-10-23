@@ -13,9 +13,9 @@ const { Issuer } = require('openid-client');
 // or username: token and password: a "t\d+:"+ token of the singnIn
 
 const appConfiguration = {
-  oidc_issuer: 'https://auth.dev.fixingthe.net',
-  oidc_client: 'bc7bfb5df84e259d969ae7f8fbc7b7fe',
-  oidc_scopes: 'openid',
+    oidc_issuer: 'https://auth.dev.fixingthe.net',
+    oidc_client: 'bc7bfb5df84e259d969ae7f8fbc7b7fe',
+    oidc_scopes: 'openid',
 }
 
 var IssuerCache= {}
@@ -30,8 +30,11 @@ var authBackend = jsDAVBasicAuth.extend({
                 var jwt = rawHeader.substr(7)
                 return (await this.checkIdToken(jwt))
             } else {
-                //console.log("validateUserpass: fallback guest")
-            return  {user: await models.User.findOne({where: {identifier: 'guest'}})}
+                // falback to username:password and guest user is this fails
+                // auth: user creates a legacy login pair (some key: some password)
+                // for an app with a scope
+                // console.log("validateUserpass: fallback guest")
+                return  {user: await models.User.findOne({where: {identifier: 'guest'}})}
             }
         } catch(e) {
             console.log("Auth error", e)
@@ -57,7 +60,7 @@ var authBackend = jsDAVBasicAuth.extend({
                                  }
                                 ) // ignoreNotBefore ignoreExpiration clockTolreance audience issuer
         //maxAge
-  //      console.log("Issuer fxnet-idtoken:" ,issuer, keystore, decoded, payload, new Date(payload.iat*1000))
+        //      console.log("Issuer fxnet-idtoken:" ,issuer, keystore, decoded, payload, new Date(payload.iat*1000))
 
         var oidc_provider = await models.OidcProvider.findOne({where: { issuer: payload.iss}})
         var [user, created] = await models.User.findOrCreate({where: { oidc_provider_id: oidc_provider.id, sub: payload.sub}})
