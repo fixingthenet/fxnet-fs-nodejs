@@ -24,9 +24,11 @@ var authBackend = jsDAVBasicAuth.extend({
     validateUserPass: async function(login, password, rawHeader){
         try {
             if (login == 'fxnet-idtoken') {
+                // either a "Basic <base64_encode(idtoken:jwt)>"
                 console.debug("Basic fxnet-idtoken", password)
                 return (await this.checkIdToken(password))
             } else if (rawHeader.toLowerCase().indexOf("bearer") == 0) {
+                // or a "Bearer <jwt>"
                 var jwt = rawHeader.substr(7)
                 return (await this.checkIdToken(jwt))
             } else {
