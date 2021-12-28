@@ -16,8 +16,10 @@ const JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const jsDAV_Locks_Backend_FS = require("jsDAV/lib/DAV/plugins/locks/fs");
 const authPlugin = require('jsDAV/lib/DAV/plugins/auth');
 const authBackend = require('./auth');
+const authMiddleware = require('./authMiddleware');
 const inodesTree = require('./tree');
 const Backends = require('./backends');
+
 var tree=inodesTree;
 
 Backends.register(require('./backends/hashedLocal'));
@@ -34,7 +36,7 @@ async function start(listen) {
     }
 
     app.use(logger('dev'));
-
+    app.use(authMiddleware)
     // when adding something here don't forget to escape from the jdav servers below
 
     app.options('/ui', (req, res) => {
@@ -53,9 +55,26 @@ async function start(listen) {
             "oidc_client_id": "bc7bfb5df84e259d969ae7f8fbc7b7fe",
             "oidc_scopes": 'openid'
         }
-
                                   }
         var serialized = AppConfigurationSerializer.serialize(data);
+        res.send(JSON.stringify(serialized))
+    })
+
+    app.get('/api/v1/clients', async (req, res) => {
+        console.log("Special clients")
+        var clients = await models.Client.findAll({
+          where: {
+            user_id: 6
+          },
+          limit: 100,
+          offset: 0,
+        })
+        
+        var Serializer = new JSONAPISerializer('clients', {
+            attributes: ['name','identifier','description','created_at', 'updated_at'],
+            keyForAttribute: 'underscore_case',
+        });
+        var serialized = Serializer.serialize(clients);
         res.send(JSON.stringify(serialized))
     })
 

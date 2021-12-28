@@ -25,18 +25,28 @@ var authBackend = jsDAVBasicAuth.extend({
         try {
             if (login == 'fxnet-idtoken') {
                 // either a "Basic <base64_encode(idtoken:jwt)>"
-                console.debug("Basic fxnet-idtoken", password)
+//                console.debug("Basic fxnet-idtoken", password)
                 return (await this.checkIdToken(password))
             } else if (rawHeader.toLowerCase().indexOf("bearer") == 0) {
                 // or a "Bearer <jwt>"
                 var jwt = rawHeader.substr(7)
                 return (await this.checkIdToken(jwt))
             } else {
+                //then it should be legacy client stuff
+                var client = await models.Client.findOne({
+                  where: { identifier: login, secret: password}, 
+                  include: [ { model: models.User, as: 'user' } ] 
+                  })
+//                 console.log("User found", login, password, client)
+                if (client) {
+                  return { user: client.user }
+                } else {
                 // falback to username:password and guest user is this fails
                 // auth: user creates a legacy login pair (some key: some password)
                 // for an app with a scope
                 // console.log("validateUserpass: fallback guest")
-                return  {user: await models.User.findOne({where: {identifier: 'guest'}})}
+                  return  {user: await models.User.findOne({where: {identifier: 'guest'}})}
+                }
             }
         } catch(e) {
             console.log("Auth error", e)
@@ -54,7 +64,7 @@ var authBackend = jsDAVBasicAuth.extend({
 
         var keystore = await issuer.keystore()
         var decoded = jws.decode(jwtString)
-        console.debug("decoded:", decoded)
+//        console.debug("decoded:", decoded)
         var payload = jwt.verify(jwtString,jwktopem(keystore.get(decoded.header.kid)),
                                  {
                                      algorithms: ['RS256'],

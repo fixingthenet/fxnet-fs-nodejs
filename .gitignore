@@ -9,4 +9,4 @@ dist/
 
 config/secrets/*.pem
 data/*
-
+tmp/*
