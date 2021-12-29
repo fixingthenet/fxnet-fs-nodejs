@@ -56,6 +56,8 @@ var authBackend = jsDAVBasicAuth.extend({
     },
 
     async checkIdToken(jwtString) {
+        var appConfigurationId=process.env.APP_CONFIGURATION_IDENTIFIER
+        
         var issuer = IssuerCache[appConfiguration.oidc_issuer]
         if (!issuer) {
             var issuer = await Issuer.discover(appConfiguration.oidc_issuer)
