@@ -45,18 +45,13 @@ async function start(listen) {
     })
 
 
-    app.get('/api/v1/app_configurations/:id', (req, res) => {
-        console.log("Special app confgiurations")
+    app.get('/api/v1/app_configurations/:id', async (req, res) => {
+        console.log("Special app configurations", req.params)
         var AppConfigurationSerializer = new JSONAPISerializer('app_configurations', {
             attributes: ['configuration']
         });
-        var data={ configuration: {
-            "oidc_issuer":"https://auth.dev.fixingthe.net",
-            "oidc_client_id": "bc7bfb5df84e259d969ae7f8fbc7b7fe",
-            "oidc_scopes": 'openid'
-        }
-                                  }
-        var serialized = AppConfigurationSerializer.serialize(data);
+        var appConfiguration = await models.AppConfiguration.findOne({where: { id: req.params.id }})
+        var serialized = AppConfigurationSerializer.serialize(appConfiguration);
         res.send(JSON.stringify(serialized))
     })
 

@@ -3,9 +3,6 @@ const Sequelize = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
     const AppConfiguration = sequelize.define('AppConfiguration', {
-        name: {
-            type: DataTypes.STRING
-        },
         configuration: {
             type: DataTypes.JSONB
         },
