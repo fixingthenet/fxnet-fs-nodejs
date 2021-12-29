@@ -3,9 +3,20 @@
 
 import app from './app';
 
+const awaitMatcher = /^(?:\s*(?:(?:let|var|const)\s)?\s*([^=]+)=\s*|^\s*)(await\s[\s\S]*)/;
+
+const asyncWrapper = (code, binder) => {
+  let assign = binder ? `global.${binder} = ` : '';
+  return `(function(){ async function _wrap() { return ${assign}${code} } return _wrap();})()`;
+};    
+
 var ctx={models: app.models}
 var resolver = function(code) {
-    // TODO: Log the answer in a database
+
+  const match = code.match(awaitMatcher)  
+  if (match) {
+    code = `${asyncWrapper(match[2],match[1])}`;  
+  }
     try {
         console.log(eval(code))
     } catch(e) {
@@ -13,8 +24,7 @@ var resolver = function(code) {
     }
 }
 
-const repl = require('repl'),
-      fs = require('fs'),
+const fs = require('fs'),
       pjson = require('../package.json')
 
 app.start(false).then(() => {

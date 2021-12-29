@@ -4,16 +4,16 @@ class Backends {
     }
 
     register(backend) {
-        this._backends[backend.name]=backend
+        this._backends[backend.identifier]=backend
         return this
     }
 
-    get(name) {
-        return this._backends[name]
+    get(identifier) {
+        return this._backends[identifier]
     }
 
-    instance(name, config) {
-        var klass = this.get(name)
+    instance(identifier, config) {
+        var klass = this.get(identifier)
         return (new klass(config))
     }
 }

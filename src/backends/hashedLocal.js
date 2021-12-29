@@ -209,6 +209,6 @@ class HashedLocal {
 
 }
 
-HashedLocal.name='HashedLocal'
+HashedLocal.identifier='HashedLocal'
 
 module.exports= HashedLocal

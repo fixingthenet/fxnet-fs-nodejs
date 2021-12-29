@@ -9,11 +9,9 @@ module.exports = {
                     allowNull: false,
                     default: Sequelize.UUIDV4,
                     primaryKey: true,
-                    type: Sequelize.UUID
-                },
-                name: {
-                    type: Sequelize.STRING(250),
-                    allowNull: false,
+                    type: Sequelize.UUID,
+                    default: 'gen_random_uuid()',
+                    
                 },
                 configuration: {
                     type: Sequelize.JSONB,
@@ -26,6 +24,10 @@ module.exports = {
                     default: '{}'
                 },
                 created_at: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                }
+                updated_at: {
                     allowNull: false,
                     type: Sequelize.DATE
                 }

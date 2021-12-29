@@ -211,6 +211,6 @@ class MirroredLocal {
 
 }
 
-MirroredLocal.name='MirroredLocal'
+MirroredLocal.identifier='MirroredLocal'
 
 module.exports= MirroredLocal

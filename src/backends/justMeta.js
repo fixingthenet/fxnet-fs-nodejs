@@ -23,6 +23,6 @@ class JustMeta {
 
 }
 
-JustMeta.name='JustMeta'
+JustMeta.identifier='JustMeta'
 
 module.exports= JustMeta

@@ -1,4 +1,4 @@
 module.exports = function(req,res, next) {
-  console.log("authMiddleware")    
+  console.log("authMiddleware:", req.headers)    
   next()
 };
