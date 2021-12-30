@@ -137,6 +137,42 @@ async function start(listen) {
         res.send(JSON.stringify(serialized))
     })
 
+    app.post('/api/v1/clients',  jsonParser, async (req, res) => {
+        console.log("Special clients", req.params.id)
+        
+        var client = new models.Client
+        
+        changedAttributes = []
+        if (req.body && req.body.data && req.body.data.attributes) {
+          changedAttributes = Object.keys(req.body.data.attributes)
+          console.log("Changed attributes:", changedAttributes)
+        }
+        
+        
+        var Deserializer = new JSONAPIDeserializer('clients', {
+            attributes: _.intersection(['name','description'],changedAttributes),
+            keyForAttribute: 'underscore_case',
+        });
+        
+        var deserialized = await Deserializer.deserialize(req.body);
+        console.log("Deserialized:", deserialized)
+        Object.keys(deserialized).forEach( (key) => {
+          if (key == 'id') return
+          client[key] = deserialized[key]
+        })
+        
+        client.user_id = 6
+        
+        await client.save()
+
+        var Serializer = new JSONAPISerializer('clients', {
+            attributes: ['name','identifier','description','created_at', 'updated_at'],
+            keyForAttribute: 'underscore_case',
+        });
+        var serialized = Serializer.serialize(client);
+        res.send(JSON.stringify(serialized))
+    })
+
 
     app.get('/ep/health.json', (req,res) => {
         console.log("Special health")
