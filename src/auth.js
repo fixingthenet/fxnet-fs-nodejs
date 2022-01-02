@@ -12,12 +12,6 @@ const { Issuer } = require('openid-client');
 // either real username and password
 // or username: token and password: a "t\d+:"+ token of the singnIn
 
-const appConfiguration = {
-    oidc_issuer: 'https://auth.dev.fixingthe.net',
-    oidc_client: 'bc7bfb5df84e259d969ae7f8fbc7b7fe',
-    oidc_scopes: 'openid',
-}
-
 var IssuerCache= {}
 
 var authBackend = jsDAVBasicAuth.extend({
@@ -56,9 +50,12 @@ var authBackend = jsDAVBasicAuth.extend({
     },
 
     async checkIdToken(jwtString) {
-        var issuer = IssuerCache[appConfiguration.oidc_issuer]
+        var appConfigurationId=process.env.APP_CONFIGURATION_IDENTIFIER
+        var appConfiguration = await models.AppConfiguration.findByPk(appConfigurationId)
+        
+        var issuer = IssuerCache[appConfiguration.configuration.oidc_issuer]
         if (!issuer) {
-            var issuer = await Issuer.discover(appConfiguration.oidc_issuer)
+            var issuer = await Issuer.discover(appConfiguration.configuration.oidc_issuer)
             IssuerCache[appConfiguration.oidc_issuer]=issuer
         }
 
