@@ -4,6 +4,7 @@ module.exports ={
     "password": process.env.DB_PASSWORD,
     "database": process.env.DB_DATABASE,
     "host": process.env.DB_HOST,
+    "port": process.env.DB_PORT || 5432,
     "dialect": "postgres",
     "logging": false,
     "pool": {
@@ -29,6 +30,7 @@ module.exports ={
     "password": process.env.DB_PASSWORD,
     "database": process.env.DB_DATABASE,
     "host": process.env.DB_HOST,
+    "port": process.env.DB_PORT || 5432,
     "logging": false,
     "dialect": "postgres",
     'migrationStorageTableName': 'sequelize_meta',

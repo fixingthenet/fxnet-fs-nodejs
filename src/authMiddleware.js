@@ -43,8 +43,8 @@ const checkIdToken = async function(jwtString) {
 
 module.exports = async function(req,res, next) {
 //  console.log("authMiddleware:", req.headers.authorization)
-  var token=req.headers.authorization.match(/Token token="(.*)"/)[1]
   try {
+    var token=req.headers.authorization.match(/Token token="(.*)"/)[1]
     var sc = await checkIdToken(token)
   } catch(e) {
     var sc = {user: await models.User.findOne({where: {identifier: 'guest'}})}
