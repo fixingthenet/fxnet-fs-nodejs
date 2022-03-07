@@ -89,17 +89,8 @@ class StoragePath {
         var wrappedCs = await Promise.all(cs.map( async (inodeChild) => {
             return await this._wrapInode(inodeChild)
         }))
-//                console.log("wraped Children:", cs, wrappedCs)
         return wrappedCs
     }
-
-/*    async child(name) {
-        this._throwNonExisting("doesn't have a child")
-        if (!this.inode.is_folder)
-            throw("Only folder can have children")
-
-        return this._wrapInode(await this.inode.child(name))
-    }*/
 
     async createChild(name,isFolder) {
         this._throwNonExisting("can't create children")

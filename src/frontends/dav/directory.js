@@ -32,6 +32,7 @@ var FSDirectory = FSNode.extend(iCollection,
     async getChildren() {
         this.readAllowed()
         var children = await this.storagePath.children()
+        console.log("Children", children.map( (c) => { return c.path } ))
         return children.map( (child) => {return FSDirectory.wrap(child, this.tree)})
     },
 
