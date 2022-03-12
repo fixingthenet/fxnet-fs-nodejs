@@ -24,7 +24,7 @@ var inodesTree = jsDAV_Tree.extend ({
     async getNodeForPath(path) {
         var sp=new StoragePath(path,this);
         await sp.initialize()
-        console.log("Tree:", sp.entry.name)
+        console.log("Tree:", path)
         if (sp.inode) {
             return FSDirectory.wrap(sp, this)
         } else {
