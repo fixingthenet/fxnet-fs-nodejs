@@ -1,10 +1,10 @@
 FROM node:12.11.1-stretch
 
 ENV FORCEBUILD='20210507'
-RUN apt update -y && \
-    apt install -y \
-    procps  \
-    joe
+#RUN apt update -y && \
+#    apt install -y \
+#    procps  \
+#    joe
 
 ADD .yarnrc /root/.yarnrc
 ENV APP_DIR=/code
@@ -17,6 +17,7 @@ RUN yarn global add babel-cli
 ADD package.json package.json
 ADD yarn.lock yarn.lock
 
-RUN yarn install
+RUN yarn cache clean && \
+    yarn install -f
 
 ADD . $APP_DIR
