@@ -103,7 +103,8 @@ class StoragePath {
              updated_at: new Date(),
              readers: this.inode.readers,
              writers: this.inode.writers,
-             admins: this.inode.admins
+             admins: this.inode.admins,
+             content_size: 0,
             })
         if (isFolder) {
             var backend= await this.backend()
