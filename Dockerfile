@@ -11,7 +11,7 @@ ENV APP_DIR=/code
 WORKDIR $APP_DIR
 ENV PATH="/install/node_modules/.bin:${PATH}"
 
-RUN yarn global add nodemon
+#RUN yarn global add nodemon
 RUN yarn global add babel-cli
 
 ADD package.json package.json
